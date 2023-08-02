@@ -4,3 +4,12 @@ simple_fsaverage_fixed_fwd.fif
 
 CAMCAN_inv.fif
 volume_fwd.fif
+simple_fsaverage_fixed_fwd.fif
+leadfield_nn_rr.mat
+invmat.mat
+invmat.mat
+leadfield_nn_rr.mat
+simple_fsaverage_fixed_fwd.fif
+surface_simple_CAM_fsaverage_fixed_fwd.fif
+test_scripts/evoked-ave.fif
+simple_fsaverage_fixed_fwd.fif
