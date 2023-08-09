@@ -1,7 +1,12 @@
 pwd
-export FREESURFER_HOME=$HOME/freesurfer
+export FREESURFER_HOME=$HOME/freesurfer/fresurfer
 source $FREESURFER_HOME/SetUpFreeSurfer.sh
 
+export FREESURFER_HOME=/home/zhibinz2/freesurfer/freesurfer/
+cd freesurfer/freesurfer
+source SetUpFreeSurfer.sh
+
+which freeview
 
 easy_lausanne \
 --subject_id /home/zhibinz2/mne_data/MNE-sample-data/subjects/fsaverage \
@@ -21,7 +26,13 @@ easy_lausanne \
 --subject_id /home/zhibinz2/freesurfer/tutorial_data_20190918_1558/buckner_data/tutorial_subjs/004 \
 --target_volume /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/CAMCAN_inverse.nii.gz \
 --target_type diffusion \
---output_dir /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization
+--output_dir /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/easy_lausanne
+
+easy_lausanne \
+--subject_id /home/zhibinz2/freesurfer/tutorial_data_20190918_1558/buckner_data/tutorial_subjs/004 \
+--target_volume /home/zhibinz2/Documents/GitHub/Virtual-Tractography/ForZhibin/Volumes/scale250/ROIv4_HR_th.nii.gz \
+--target_type diffusion \
+--output_dir /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/easy_lausanne
 
 
 cd /home/zhibinz2/mne_data/MNE-sample-data/subjects/
