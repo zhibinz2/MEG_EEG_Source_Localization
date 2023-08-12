@@ -14,3 +14,5 @@ surface_simple_CAM_fsaverage_fixed_fwd.fif
 test_scripts/evoked-ave.fif
 simple_fsaverage_fixed_fwd.fif
 test_scripts/CAMCAN_fsaverage_no_scaling_trans.fif
+leadfield_nn_rr.mat
+leadfield_nn_rr.mat
