@@ -17,3 +17,6 @@ hold on
 plot3(x,y,z,'k.','MarkerSize',10)
 view([0,1,0])
 xlabel('x');ylabel('y');zlabel('z')
+
+%% eeglab
+eeglab
