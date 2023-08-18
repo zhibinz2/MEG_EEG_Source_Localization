@@ -46,5 +46,6 @@ for i = 1:length(lowDimVert)
     label             = parcels(inds); 
     lowDimVert_labels(i) = label;
 end
+bar(lowDimVert_labels)
 save('labeled_brain_source.mat','lowDimVert_labels')
 
