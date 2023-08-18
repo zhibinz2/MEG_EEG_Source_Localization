@@ -1,0 +1,22 @@
+load('leadfield_nn_rr.mat')
+load('scale250_Connectome.mat')
+source_x=source_rr(:,1) * 1e3 + 2.5;
+source_y=source_rr(:,2) * 1e3 -30;
+source_z=source_rr(:,3) * 1e3 -42;
+source_xyz=[source_x source_y source_z];
+
+%% Anni's labeling
+% cd ../../Virtual-Tractography/ForZhibin/Volumes/scale250
+% tmp = read_avw('ROIv4_HR_th.nii.gz'); n
+% tmp = permute(tmp, [1 3 2]);
+% tmp = tmp(256:-1:1,:, 256:-1:1);
+% parcels = tmp;
+num_source=size(source_xyz,1);
+lowDimVert = source_xyz+127.5; % 127.5 is based on the fsaverage volume being 256 x 256 x 256
+lowDimVert_labels=zeros(num_source,1);
+for i = 1:length(lowDimVert)
+    vox = ceil(lowDimVert(i,:));
+    inds              = sub2ind([size(parcels)], vox(:,1), vox(:,2), vox(:,3));
+    label             = parcels(inds); %what is the label?
+    lowDimVert_labels(i) = label;
+end
