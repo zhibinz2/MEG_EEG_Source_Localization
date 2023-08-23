@@ -9,6 +9,7 @@ trisurf(tr,'EdgeColor',[0.01 0.01 0.01],'EdgeAlpha',0.1);
 % alpha 0.1
 
 cd C:\Users\zhouz\GitHub\MEG_EEG_Source_Localization\test_scripts\EEG_chan
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/test_scripts/EEG_chan
 load('Electrode256_alignedtoFS.mat')
 Coordianates=Electrode.Coordinate;
 x=Coordianates(:,1);
@@ -147,19 +148,31 @@ for g=1:length(ch_groups)
         plot3(x(c),y(c),z(c),'.','color',colors14group(g,:),'MarkerSize',10);
         text(x(c),y(c),z(c), ch_labels{c},'color',colors14group(g,:),'FontSize', 12);
     end
-    text(-110,100-10*(g-1),0, group_names{g},'color',colors14group(g,:),'FontSize', 12); % for top view
-%     text(-110,0,120-10*(g-1), group_names{g},'color',colors14group(g,:),'FontSize', 12); % for front and back view
+%     text(-110,100-10*(g-1),0, group_names{g},'color',colors14group(g,:),'FontSize', 12); % for top view
+    text(-110,0,120-10*(g-1), group_names{g},'color',colors14group(g,:),'FontSize', 12); % for front and back view
 end
 
-text(0,110,0,'anterior','color',[0 0 0],'FontSize', 12);
-text(0,-150,0,'posterior','color',[0 0 0],'FontSize', 12);
+% text(0,110,0,'anterior','color',[0 0 0],'FontSize', 12);
+% text(0,-150,0,'posterior','color',[0 0 0],'FontSize', 12);
 text(0,0,120,'top','color',[0 0 0],'FontSize', 12);
 text(0,0,-90,'bottom','color',[0 0 0],'FontSize', 12);
 
 
 
-view([0 0 1]); title('top view')
-view([-1 0 0]); title('left view')
-view([1 0 0]); title('right view')
+% view([0 0 1]); title('top view')
+% view([-1 0 0]); title('left view')
+% view([1 0 0]); title('right view')
 view([0 1 0]); title('front view')
-view([0 -1 0]); title('back view')
+% view([0 -1 0]); title('back view')
+
+% cd /home/zhibinz2/Documents/GitHub/archieve/STROKE/EEG_hm/fsaverage/surfaces
+% load('FSavg_surfaces.mat')
+% BrainTri=Scalp;
+cd /home/zhibinz2/Documents/GitHub/Virtual-Tractography/ForZhibin/processed_data
+load('Lausanne2008_fsaverageDSsurf_60_125_250.mat')
+BrainTri=Brain;
+Vertex=BrainTri.Vertex;
+Face=BrainTri.Face;
+tr = triangulation(Face, Vertex(:,1), Vertex(:,2), Vertex(:,3));
+trisurf(tr,'EdgeColor',[1 1 1],'EdgeAlpha',0.1);
+% alpha 0.9
