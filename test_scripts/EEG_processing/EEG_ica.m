@@ -158,23 +158,42 @@ end
 
 topoplot([1:256],egitopoinfo,'nosedir','+X','style','map','electrodes','on');colormap('hot')
 %% extract good chanlocs
+% cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/test_scripts/EGI_Brittany_Young
 cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61
 chanlocs = readlocs('GSN-HydroCel-257.sfp');
 figure;
 subplot(121)
 topoplot([1:257],chanlocs,'nosedir','+X','style','map','electrodes','on');
 colormap('jet');colorbar;clim([1 257])
-% remove bad chan
+% remove bad chan of mine
 ch_bad=[241 242 243 238 239 240 ...
     244 245 246 247 251 256 91 102 111 120 133 145 165 174 187 199 208 216 229 233 237 236 235 234 ...
     232 228 217 209 200 188 175 166 156 146 134 121 112 103 92 82 255 250 257];
+
 goodchanlocs=chanlocs;
+for ch=1:256
+    goodchanlocs(ch).labels=ch_labels{ch};
+end
+
 goodchanlocs(ch_bad)=[];
 subplot(122)
-topoplot([1:208],goodchanlocs,'nosedir','+X','style','map','electrodes','on');
+topoplot([1:208],goodchanlocs,'nosedir','+X','style','map','electrodes','labels');
 colormap('jet');colorbar;clim([1 257])
 
-%%
+%% run ICA
+addpath(genpath('/home/zhibinz2/Documents/GitHub/matlab_zhibin/EEG/hnl'))
+[icasig, A, W] = fastica(filtered_data');
+
+% Plot all ICA component
+for i=1:size(A,2)
+    SqA(i)=sumsqr(A(:,i));
+end
+figure;
+plot(1:size(A,2),SqA,'ro');ylabel('sum of square of column in A');xlabel('ICs'); 
+title('all components for L');
+
+[BL,IL]=sort(SqAL,'descend');
+ComponentsExam=IL(1:10);
 
 
 

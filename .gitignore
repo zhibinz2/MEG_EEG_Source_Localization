@@ -21,3 +21,4 @@ EEG_pipeline/subjects/fsaverage/bem/fsaverage-ico-5-src.fif
 EEG_pipeline/subjects/fsaverage/bem/fsaverage-vol-5-src.fif
 EEG_pipeline/surface_egi_fsaverage_fixed_fwd.fif
 EEG_pipeline/surface_egi_fsaverage_fixed_inv.fif
+test_scripts/EGI_Brittany_Young/OPRO_REST_20180217_104958.mat
