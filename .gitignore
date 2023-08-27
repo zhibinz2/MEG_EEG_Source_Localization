@@ -28,3 +28,6 @@ test_scripts/EEG_processing/DAON/workspace.mat
 test_scripts/EEG_processing/DAON/icadata.mat
 EEG_streamline/raw.fif
 EEG_streamline/preprocessed_eeg.mat
+EEG_streamline/fwd.fif
+EEG_streamline/inv.fif
+EEG_streamline/resting_ave.fif

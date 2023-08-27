@@ -86,6 +86,11 @@ clearvars chan_threshold var_threshold
 %% extract good chanlocs
 chanlocs = load('chanlocs.mat');
 chanlocs = chanlocs.chanlocs;
+% Add the original sequence index
+for ch=1:257 % Channel 257 is Cz
+    chanlocs(ch).urchan=ch;
+end
+
 % Create channel labels
 ch_labels = cell(256,1);
 for c = 1:256
@@ -102,7 +107,6 @@ ch_labels{116}='O1'; ch_labels{150}='O2';
 ch_labels{31}='NAS'; 
 ch_labels{21}='Fz'; ch_labels{101}='Pz'; ch_labels{126}='Oz';
 
-
 % remove ch_bad to check channel index for eyechans
 goodchanlocs=chanlocs;
 for ch=1:256
@@ -110,8 +114,14 @@ for ch=1:256
 end
 goodchanlocs(ch_bad)=[];
 
+% remove last invalid channel from ch_bad
+ch_bad=[241 242 243 238 239 240 ...
+    244 245 246 247 251 256 91 102 111 120 133 145 165 174 187 199 208 216 229 233 237 236 235 234 ...
+    232 228 217 209 200 188 175 166 156 146 134 121 112 103 92 82 255 250];
+ch_bad=sort(ch_bad)
+ch_bad
 
-clearvars goodchanlocs c ch chanloc
+clearvars c ch chanloc
 
 %% run ICA
 % addpath(genpath('/home/zhibinz2/Documents/GitHub/matlab_zhibin/EEG/hnl'))
@@ -143,20 +153,6 @@ end
 % recombine data without bad components.
 mixedsig=A(:,goodcomponents)*icasig(goodcomponents,:);
 
-ScreenSize=get(0,'MonitorPositions');
-FigureXpixels=ScreenSize(3);FigureYpixels=ScreenSize(4);
-figure('units','pixels','position',[0 0 FigureXpixels/2 FigureYpixels/2]);
-subplot(211);
-eeg_example=good_filtered_data;
-time_example=1:size(eeg_example,1);
-plot(time_example,eeg_example); 
-title('good-filtered-data');
-subplot(212);
-eeg_example=mixedsig';
-time_example=1:size(eeg_example,1);
-plot(time_example,eeg_example); 
-title('mixedsig');
-
 %% inserting the bad channels back in place with zeros
 preprocessed_eeg = zeros(256, size(mixedsig, 2));
 i = 1;
@@ -167,6 +163,14 @@ for c = 1:256
     end
 end
 
-clearvars A B corrsmax du icasig n W dubious_chans mixedsig corr_threshold
+clearvars A B corrsmax du icasig n W mixedsig corr_threshold good_filtered_data
+
+%% need to map dubious chan index to the original 256 index
+goodchanlocs
+
+for i length(dubious_chans)
+
+ch_dubious 
+
 %% save
-save('preprocessed_eeg.mat','preprocessed_eeg','Fs',"goodchan",'badchan','eyechans','ch_bad','ch_labels','chanlocs','subject_ID')
+save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_labels','chanlocs','subject_ID')

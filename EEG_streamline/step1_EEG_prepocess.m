@@ -86,6 +86,11 @@ clearvars chan_threshold var_threshold
 %% extract good chanlocs
 chanlocs = load('chanlocs.mat');
 chanlocs = chanlocs.chanlocs;
+% Add the original sequence index
+for ch=1:257 % Channel 257 is Cz
+    chanlocs(ch).urchan=ch;
+end
+
 % Create channel labels
 ch_labels = cell(256,1);
 for c = 1:256
@@ -102,7 +107,6 @@ ch_labels{116}='O1'; ch_labels{150}='O2';
 ch_labels{31}='NAS'; 
 ch_labels{21}='Fz'; ch_labels{101}='Pz'; ch_labels{126}='Oz';
 
-
 % remove ch_bad to check channel index for eyechans
 goodchanlocs=chanlocs;
 for ch=1:256
@@ -110,8 +114,14 @@ for ch=1:256
 end
 goodchanlocs(ch_bad)=[];
 
+% remove last invalid channel from ch_bad
+ch_bad=[241 242 243 238 239 240 ...
+    244 245 246 247 251 256 91 102 111 120 133 145 165 174 187 199 208 216 229 233 237 236 235 234 ...
+    232 228 217 209 200 188 175 166 156 146 134 121 112 103 92 82 255 250];
+ch_bad=sort(ch_bad)
+ch_bad
 
-clearvars goodchanlocs c ch chanloc
+clearvars c ch chanloc
 
 %% run ICA
 % addpath(genpath('/home/zhibinz2/Documents/GitHub/matlab_zhibin/EEG/hnl'))
@@ -153,6 +163,17 @@ for c = 1:256
     end
 end
 
-clearvars A B corrsmax du icasig n W dubious_chans mixedsig corr_threshold good_filtered_data
+clearvars A B corrsmax du icasig n W mixedsig corr_threshold good_filtered_data
+
+%% need to map dubious chan index to the original 256 index
+goodchanlocs;
+
+ch_dubious=nan(1,length(dubious_chans))
+for i = 1:length(dubious_chans)
+    ch_dubious(i) = goodchanlocs(dubious_chans(i)).urchan;
+end
+
+ch_dubious;
+
 %% save
-save('preprocessed_eeg.mat','preprocessed_eeg','Fs',"goodchan",'badchan','eyechans','ch_bad','ch_labels','chanlocs','subject_ID')
+save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_labels','chanlocs','subject_ID')
