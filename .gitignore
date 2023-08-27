@@ -26,3 +26,5 @@ goodchanEGI_pipeline/egi_raw.fif
 goodchanEGI_pipeline/surface_egi_fsaverage_fixed_fwd.fif
 test_scripts/EEG_processing/DAON/workspace.mat
 test_scripts/EEG_processing/DAON/icadata.mat
+EEG_streamline/raw.fif
+EEG_streamline/preprocessed_eeg.mat
