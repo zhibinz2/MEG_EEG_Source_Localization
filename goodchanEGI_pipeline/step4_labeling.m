@@ -41,7 +41,8 @@ source_z=source_rr(:,3) * 1e3 + z_shift;
 source_xyz=[source_x source_y source_z];
 
 %% load labels from the 'ROIv4_HR_th.nii.gz' under "ForZhibin/Volumes/scale250"
-cd ../../Virtual-Tractography/ForZhibin/Volumes/scale250/
+% cd ../../Virtual-Tractography/ForZhibin/Volumes/scale250/
+cd ../../Virtual-Tractography/ForZhibin/Volumes/scale125/
 load('parcels.mat')
 
 %% Anni's labeling method
