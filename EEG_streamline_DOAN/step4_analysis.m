@@ -1,7 +1,8 @@
 clear
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DOAN
-subject_ID='DAON'; scale=0.01; depth=2;
-load([subject_ID '_scale_' num2str(scale) '_depth_' num2str(depth) '.mat']);
+subject_ID='DAON'; 
+% scale=0.01; depth=2;
+% load([subject_ID '_scale_' num2str(scale) '_depth_' num2str(depth) '.mat']);
 
 %% (Color Scheme) 
 red   = [1 0 0];
@@ -25,15 +26,16 @@ for s = 1:3
     legends=cell(1,3);
     hold on;
     for d =1:3
-        depth=depths(d);
-        load([subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat']);
-         hold on;
-         plot(1:256,corrcoef256,'.', 'markersize', 5, 'color',colors3(d,:));
-         legends{d}=['scale ' scales{s} '-depth ' depths{d}];
-         clear corrcoef256
+        filename=[subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat'];
+        load(filename);
+        hold on;
+        plot(1:length(corrcoef_diag),corrcoef_diag,'.', 'markersize', 5, 'color',colors3(d,:));
+        legends{d}=['depth ' depths{d}];
+        clear corrcoef_diag
     end
     hold off;
     legend(legends,'location','southeast')
+    title(['scale ' scales{s}])
     xlabel('channel');ylabel('corrcoef');
     clear legends
 end
@@ -42,14 +44,23 @@ sgtitle([subject_ID ': correlation between original and reconstructed EEG']);
 scales={'0.01','0.05','0.1'}; depths={'1','2','4'};
 scales3=[0.01 0.05 0.1]; depths3=[1 2 4];
 table=nan(3,3);
+scale_var=nan(1,9);depth_var=nan(1,9);corrcoef_var=nan(1,9);
+c=1;
 for s = 1:3
     legends=cell(1,3);
     hold on;
     for d =1:3
-        load([subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat']);
-        hold on;
-        table(s,d)=nanmean(corrcoef256);
-        clear corrcoef256
+        filename=[subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat'];
+        load(filename);
+        corrcoef_var(c)=mean(corrcoef_diag);
+        scale_var(c)=scales3(s);depth_var(c)=depths3(d);
+        clear corrcoef_diag
+        c=c+1;
     end
 end
+
+figure;
+plot3(scale_var,depth_var,corrcoef_var,'.');
+xlabel('scale');ylabel('depth');zlabel('corrcoef-ave')
+grid on
 

@@ -206,12 +206,12 @@ clearvars A B corrsmax du icasig n W mixedsig corr_threshold good_filtered_data
 %% need map the original index of the dubious chans
 open goodchanlocs;
 
-ch_dubious=nan(1,length(dubious_chans));
+ch_dubious=nan(1,length(dubious_chans))
 for i = 1:length(dubious_chans)
     ch_dubious(i) = goodchanlocs(dubious_chans(i)).urchan;
 end
-dubious_chans; % 67    73    81   192   193   199   200   201   202   203   204   205   206   207   208
-ch_dubious; % 67    73    81   218   219   225   226   227   230   231   248   249   252   253   254
+
+ch_dubious;
 
 %% save
 save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_labels','chanlocs','subject_ID')

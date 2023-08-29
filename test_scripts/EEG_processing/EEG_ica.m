@@ -264,14 +264,15 @@ corrs=zeros(length(dubious_chans),size(icasig,1));
 for du = 1:length(dubious_chans)
     corrs(du, :)=corr(icasig',good_filtered_data(:,dubious_chans(du)));
 end
-% imagesc(coors);colormap('jet');colorbar;xlabel('components');ylabel('dubious chans'); clim([-0.5 0.5])
+% figure;imagesc(corrs);colormap('jet');colorbar;xlabel('components');ylabel('dubious chans'); clim([-0.5 0.5])
 corrsmax = max(corrs);
-% bar(corrmax)
+% figure;bar(corrsmax)
 
 % detect which components are not too correlated with eye channels
 goodcomponents = abs(corrsmax) < corr_threshold;
 chancomponents = zeros(size(icasig,1),1);
 B = zeros(nchans,size(icasig,1));
+tic
 for n = 1:size(icasig,1)
     B(:,n)=A(:,n).^2 / sum(A(:,n).^2);
     chancomponents(n)=max(B(:,n));
@@ -279,6 +280,7 @@ for n = 1:size(icasig,1)
         goodcomponents(n)=0;
     end
 end
+toc
 % bar(chancomponents)
 
 % recombine data without bad components.
