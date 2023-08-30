@@ -16,20 +16,20 @@ matlab_orange=[0.8500 0.3250 0.0980];
 matlab_purple=[0.4940 0.1840 0.5560];
 % combine colors
 colors9=[red;pink;black;blue;darkgreen;deepyellow;matlab_blue;matlab_orange;matlab_purple];
-colors3=[deepyellow;matlab_blue;matlab_orange];
+colors4=[matlab_blue;matlab_orange;deepyellow;darkgreen];
 
 %%
-scales={'0.01','0.05','0.1'}; depths={'1','2','4'};
+scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
 figure;
-for s = 1:3
-    subplot(1,3,s)
-    legends=cell(1,3);
+for s = 1:length(scales)
+    subplot(1,length(scales),s)
+    legends=cell(1,length(depths));
     hold on;
-    for d =1:3
+    for d = 1:length(depths)
         filename=[subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat'];
         load(filename);
         hold on;
-        plot(1:length(corrcoef_diag),corrcoef_diag,'.', 'markersize', 5, 'color',colors3(d,:));
+        plot(1:length(corrcoef_diag),corrcoef_diag,'.', 'markersize', 5, 'color',colors4(d,:));
         legends{d}=['depth ' depths{d}];
         clear corrcoef_diag
     end
@@ -41,15 +41,16 @@ for s = 1:3
 end
 sgtitle([subject_ID ': correlation between original and reconstructed EEG']);
 %%
-scales={'0.01','0.05','0.1'}; depths={'1','2','4'};
-scales3=[0.01 0.05 0.1]; depths3=[1 2 4];
-table=nan(3,3);
-scale_var=nan(1,9);depth_var=nan(1,9);corrcoef_var=nan(1,9);
+scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
+scales3=[0.01 0.05 0.1 0.3 0.5]; depths3=[0.8 1 2 4];
+scale_var=nan(1,length(scales)*length(depths));
+depth_var=nan(1,length(scales)*length(depths));
+corrcoef_var=nan(1,length(scales)*length(depths));
 c=1;
-for s = 1:3
-    legends=cell(1,3);
+for s = 1:length(scales)
+    legends=cell(1,length(depths));
     hold on;
-    for d =1:3
+    for d = 1:length(depths)
         filename=[subject_ID '_scale_' scales{s} '_depth_' depths{d} '.mat'];
         load(filename);
         corrcoef_var(c)=mean(corrcoef_diag);
@@ -62,5 +63,6 @@ end
 figure;
 plot3(scale_var,depth_var,corrcoef_var,'.');
 xlabel('scale');ylabel('depth');zlabel('corrcoef-ave')
+title(subject_ID);
 grid on
 

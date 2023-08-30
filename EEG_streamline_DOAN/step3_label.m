@@ -1,7 +1,7 @@
 clear
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DOAN/
 subject_ID='DAON'; 
-scales={'0.01','0.05','0.1'}; depths={'1','2','4'};
+scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
 
 %% alignment
 load('./Lausanne2008_fsaverageDSsurf_60_125_250.mat')
@@ -11,8 +11,8 @@ load('parcels.mat') % This is the labels
 
 %% Anni's labeling method
 
-for s = 1:3
-    for d = 1:3
+for s = 1:length(scales)
+    for d = 1:length(depths)
         scale=scales{s}; depth=depths{d};
         
         filename=[subject_ID '_scale_' scale '_depth_' depth '.mat']

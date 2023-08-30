@@ -6,10 +6,10 @@ clear
 % raw EEG file from Cramer
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DOAN
 cd ../../archive/EEG_StrokePatients_n61/
-subject_ID='DAON'
+subject_ID='DAON' % subacute 9d subcortical
 load([subject_ID '_EPHD21_20151116_1200.mat'])
-cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DOAN
 
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DOAN
 %% average re-reference
 rData=Data-ones(size(Data,1),1)*mean(Data,1);
 
