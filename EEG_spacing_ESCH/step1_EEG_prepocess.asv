@@ -4,11 +4,11 @@
 % data EPHD21
 clear
 % raw EEG file from Cramer
-cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_JOHR
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH
 cd ../../archive/EEG_StrokePatients_n61/
-subject_ID='JOHR' % subacute 9d cortical
-load([subject_ID 'JOHR_AILH19_20160429_1200.mat'])
-cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_JOHR
+subject_ID='ESCH' 
+load([subject_ID '_QJVN35_20140228_1227.mat'])
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH
 
 % subject_ID='ESCH' % chronic 3435d cortical
 % load([subject_ID '_QJVN35_20140228_1227.mat'])
@@ -219,3 +219,9 @@ ch_dubious; % 67    73    81   218   219   225   226   227   230   231   248   2
 
 %% save
 save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_labels','chanlocs','subject_ID')
+
+%% test covariance
+C=cov(preprocessed_eeg');
+figure;
+imagesc(C);colorbar();colormap('jet');clim([-1 1]);
+D=diag(C);

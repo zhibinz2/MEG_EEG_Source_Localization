@@ -6,7 +6,7 @@ clear
 % raw EEG file from Cramer
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH
 cd ../../archive/EEG_StrokePatients_n61/
-subject_ID='ESCH' % subacute 9d cortical
+subject_ID='ESCH' 
 load([subject_ID '_QJVN35_20140228_1227.mat'])
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH
 
@@ -181,19 +181,19 @@ sum(goodcomponents)
 % recombine data without bad components.
 mixedsig=A(:,goodcomponents)*icasig(goodcomponents,:);
 
-% ScreenSize=get(0,'MonitorPositions');
-% FigureXpixels=ScreenSize(3);FigureYpixels=ScreenSize(4);
-% figure('units','pixels','position',[0 0 FigureXpixels/2 FigureYpixels/2]);
-% subplot(211);
-% eeg_example=good_filtered_data;
-% time_example=1:size(eeg_example,1);
-% plot(time_example,eeg_example); 
-% title('good-filtered-data');
-% subplot(212);
-% eeg_example=mixedsig';
-% time_example=1:size(eeg_example,1);
-% plot(time_example,eeg_example); 
-% title('mixedsig');
+ScreenSize=get(0,'MonitorPositions');
+FigureXpixels=ScreenSize(3);FigureYpixels=ScreenSize(4);
+figure('units','pixels','position',[0 0 FigureXpixels/2 FigureYpixels/2]);
+subplot(211);
+eeg_example=good_filtered_data;
+time_example=1:size(eeg_example,1);
+plot(time_example,eeg_example); 
+title('good-filtered-data');
+subplot(212);
+eeg_example=mixedsig';
+time_example=1:size(eeg_example,1);
+plot(time_example,eeg_example); 
+title('mixedsig');
 
 %% inserting the bad channels back in place with zeros
 preprocessed_eeg = zeros(256, size(mixedsig, 2));
@@ -219,3 +219,17 @@ ch_dubious; % 67    73    81   218   219   225   226   227   230   231   248   2
 
 %% save
 save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_labels','chanlocs','subject_ID')
+
+
+%%
+eeg_example=preprocessed_eeg';
+time_example=1:size(eeg_example,1);
+plot(time_example,eeg_example); 
+title('preprocessed_eeg');
+
+%% test covariance
+C=cov([mixedsig]');
+figure;
+imagesc(C);colorbar();colormap('jet');clim([-1 1]);
+D=diag(C);
+mean(D)
