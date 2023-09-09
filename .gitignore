@@ -51,3 +51,12 @@ EEG_streamline_ESCH/raw.fif
 EEG_spacing_ESCH/raw.fif
 EEG_spacing_ESCH/raw.fif
 EEG_spacing_ESCH/preprocessed_eeg.mat
+EEG_spacing_DAON/fwd.fif
+EEG_spacing_JOHR/fwd.fif
+EEG_spacing_JOHR/raw.fif
+EEG_streamline_DAON/fwd.fif
+EEG_streamline_DAON/raw.fif
+EEG_spacing_DAON/raw.fif
+EEG_spacing_DAON/preprocessed_eeg.mat
+EEG_spacing_JOHR/preprocessed_eeg.mat
+EEG_streamline_DAON/preprocessed_eeg.mat
