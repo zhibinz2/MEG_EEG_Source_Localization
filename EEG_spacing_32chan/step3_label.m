@@ -1,9 +1,8 @@
 clear
-cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH/
-subject_ID='ESCH'; 
-% scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_32chan
+subject_ID='20220713'; 
 scale=0.05; depth=0.8;
-icos={'2','3','4'}; %icos={'2','3','4','5'};
+icos={'4'}; %icos={'2','3','4','5'};
 
 %% alignment
 load('./Lausanne2008_fsaverageDSsurf_60_125_250.mat')

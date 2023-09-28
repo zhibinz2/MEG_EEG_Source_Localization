@@ -1,6 +1,6 @@
 clear
-cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH/
-subject_ID='ESCH'; 
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_32chan
+subject_ID='20220713'; 
 % scale=0.01; depth=2;
 % load([subject_ID '_scale_' num2str(scale) '_depth_' num2str(depth) '.mat']);
 
@@ -19,13 +19,13 @@ colors9=[red;pink;black;blue;darkgreen;deepyellow;matlab_blue;matlab_orange;matl
 colors4=[matlab_blue;matlab_orange;darkgreen];
 
 %%
-scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
-s=2;d=1;
-icos={'2','3','4'}; % icos={'2','3','4','5'}
+scales={'0.05'}; depths={'0.8'};
+s=1;d=1;
+icos={'4'}; % icos={'2','3','4','5'}
 scale=0.05; depth=0.8;
 figure;
 legends=cell(1,length(icos));
-for i = 1:length(icos)
+for i = 1
     hold on;
     filename=[subject_ID '_ico_' icos{i} '_scale_' scales{s} '_depth_' depths{d} '.mat'];
     load(filename);
@@ -38,18 +38,17 @@ legend(legends,'location','southeast')
 xlabel('channel');ylabel('corrcoef');
 title([subject_ID ': correlation between original and reconstructed EEG']);
 %%
-scales={'0.01','0.05','0.1','0.3','0.5'}; depths={'0.8','1','2','4'};
-scales3=[0.01 0.05 0.1 0.3 0.5]; depths3=[0.8 1 2 4];
-% icos={'2','3','4','5'}; icos3=[2 3 4 5];
-icos={'2','3','4'}; icos3=[2 3 4];
+scales={'0.05'}; depths={'0.8'};
+scales3=[0.05]; depths3=[0.8];
+icos={'4'}; icos3=[4];
 % scale_var=nan(1,length(scales)*length(depths));
 % depth_var=nan(1,length(scales)*length(depths));
 corrcoef_var=nan(1,length(icos3));
 c=1;
-for i = 1:length(icos)
+for i = 1
     legends=cell(1,length(icos));
     hold on;
-    filename=[subject_ID '_ico_' icos{i} '_scale_' scales{2} '_depth_' depths{1} '.mat'];
+    filename=[subject_ID '_ico_' icos{i} '_scale_' scales{1} '_depth_' depths{1} '.mat'];
     load(filename);
     corrcoef_var(c)=mean(corrcoef_diag);
 %     scale_var(c)=scales3(s);depth_var(c)=depths3(d);
@@ -61,6 +60,6 @@ figure;
 scatter(icos3,corrcoef_var);
 xlabel('ico');ylabel('corrcoef-ave');
 title([subject_ID ': recursively subdivided icosahedron (ico) spacing']);
-xlim([1 5]); ylim([0.88 0.91]);
+xlim([3.5 4.5]); ylim([0.8 0.88]);
 grid on
 
