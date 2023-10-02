@@ -78,8 +78,8 @@ subtitle(['subject-ID: ' subject_ID '-ico-' icos{1} '-depth-' depths{1}]);
 clear
 load hald
 [COEFF, SCORE, LATENT] = pca(ingredients,'Centered',false);
-recon_ingredients= SCORE*COEFF';
+recon_ingredients= SCORE(:,1:3)*COEFF(:,1:3)';
 %% svd
 A = [1 2; 3 4; 5 6; 7 8]
 [U,S,V] = svd(A)
-U*S*V'
+U*S(:,1)*V(:,1)'
