@@ -73,3 +73,13 @@ colormap('jet')
 clim([-0.005 0.005])
 title(['leakage: invmat x gain  ------   Method: ' methods{1}])
 subtitle(['subject-ID: ' subject_ID '-ico-' icos{1} '-depth-' depths{1}]);
+
+%% pca
+clear
+load hald
+[COEFF, SCORE, LATENT] = pca(ingredients,'Centered',false);
+recon_ingredients= SCORE*COEFF';
+%% svd
+A = [1 2; 3 4; 5 6; 7 8]
+[U,S,V] = svd(A)
+U*S*V'

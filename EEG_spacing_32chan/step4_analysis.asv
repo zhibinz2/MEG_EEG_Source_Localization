@@ -45,12 +45,12 @@ end
 %%
 for m=1:length(methods)
     corrcoef_var=nan(1,length(scales));
-    for s = 1:length(source)
+    for s = 1:length(scales)
         legends=cell(1,length(scales));
         hold on;
         filename=[subject_ID '_method_' methods{m} '_ico_' icos{i} '_scale_' scales{s} '_depth_' depths{d} '.mat'];
         load(filename);
-        corrcoef_var(i)=mean(corrcoef_diag);
+        corrcoef_var(s)=mean(corrcoef_diag);
         clear corrcoef_diag
     end
     
@@ -73,3 +73,13 @@ colormap('jet')
 clim([-0.005 0.005])
 title(['leakage: invmat x gain  ------   Method: ' methods{1}])
 subtitle(['subject-ID: ' subject_ID '-ico-' icos{1} '-depth-' depths{1}]);
+
+%% pca
+clear
+load hald
+[COEFF, SCORE, LATENT] = pca(ingredients,'Centered',false);
+recon_ingredients= SCORE*COEFF';
+%% svd
+A = [1 2; 3 4; 5 6; 7 8]
+[U,S,V] = svd(A)
+U*S*V'
