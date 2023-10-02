@@ -1,8 +1,8 @@
 clear
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_32chan
 subject_ID='20220713'; 
-scale=0.05; depth=0.8;
-icos={'4'}; %icos={'2','3','4','5'};
+scales=[0.01, 0.05, 0.1, 0.3, 0.5]; depth=0.8;
+ico='4'; %icos={'2','3','4','5'};
 
 %% alignment
 load('./Lausanne2008_fsaverageDSsurf_60_125_250.mat')
@@ -11,8 +11,8 @@ Vertex=Brain.Vertex;
 load('parcels.mat') % This is the labels
 
 %% Anni's labeling method
-for i = 1:length(icos)
-    ico=icos{i}
+for i = 1:length(scales)
+    scale=scales(i)
     filename=[subject_ID '_ico_' ico '_scale_' num2str(scale) '_depth_' num2str(depth) '.mat']
     load(filename);
     x_shift=(max(Vertex(:,1))-max(source_rr(:,1))*1e3)/2+(min(Vertex(:,1))-min(source_rr(:,1))*1e3)/2;

@@ -2,7 +2,7 @@ clear
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_32chan
 subject_ID='20220713'; 
 scales5=[0.01, 0.05, 0.1, 0.3, 0.5]; 
-methods={'MNE','dSPM','sLORETA','eLORETA'};
+methods={'MNE','dSPM','sLORETA','eLORETA'}
 % load([subject_ID '_scale_' num2str(scale) '_depth_' num2str(depth) '.mat']);
 
 %% (Color Scheme) 
@@ -65,5 +65,5 @@ imagesc(leakage)
 colorbar()
 colormap('jet')
 clim([-0.005 0.005])
-title(['leakage: invmat x gain  ------   Method: ' methods{1}])
+title(['leakage: invmat x gain    Method: '])
 subtitle(['subject-ID: ' subject_ID '-ico-' icos{1} '-depth-' depths{1}]);

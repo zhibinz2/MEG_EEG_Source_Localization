@@ -35,7 +35,8 @@ save('preprocessed_eeg.mat','preprocessed_eeg','Fs','ch_dubious','ch_bad','ch_la
 % eeg_example=preprocessed_eeg';
 % time_example=1:size(eeg_example,1);
 % figure;
-% plot(time_example,eeg_example); 
+% clf;
+% plotx(time_example,eeg_example(:,[13 31])); 
 % title('preprocessed-eeg');
 % 
 % %% test covariance
