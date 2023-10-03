@@ -74,12 +74,23 @@ clim([-0.005 0.005])
 title(['leakage: invmat x gain  ------   Method: ' methods{1}])
 subtitle(['subject-ID: ' subject_ID '-ico-' icos{1} '-depth-' depths{1}]);
 
-%% pca
+%% tryout pca
 clear
 load hald
 [COEFF, SCORE, LATENT] = pca(ingredients,'Centered',false);
 recon_ingredients= SCORE(:,1:3)*COEFF(:,1:3)';
-%% svd
+%% tryout svd
 A = [1 2; 3 4; 5 6; 7 8]
 [U,S,V] = svd(A)
 U*S(:,1)*V(:,1)'
+%% load source data after beamformer
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8.mat')
+% pickle = py.importlib.import_module('pickle');
+% data=h5read('stc.fif-stc.h5','/home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_32chan')
+tic
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data1.mat')
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data2.mat')
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data3.mat')
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data4.mat')
+load('20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data5.mat')
+toc
