@@ -188,7 +188,7 @@ cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/u
 L=leadfield;
 leakage=[squeeze(allOpInv(5,:,:))]'*leadfield;
 
-%% test inversemat.m 
+%% test the performance of inversemat.m 
 load('preprocessed_eeg.mat')
 load('20220713_method_MNE_ico_4_scale_0.01_depth_0.8.mat')
 
