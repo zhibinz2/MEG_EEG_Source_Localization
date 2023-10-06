@@ -272,3 +272,51 @@ for i = 1:length(source_fsaverage)
     source_labels(i) = label;
 end
 % bar(source_labels)
+% min(unique(source_labels))
+fra_eigenvalues=zeros(1,max(unique(source_labels)));
+% ave_source_data=zeros(size(source_data,2),max(unique(source_labels)));
+% ave_source_coor=zeros(max(unique(source_labels)),3)
+ave_source_data=[];
+agr_source_data=[];
+ave_source_coor=[];ave_source_label=[];
+tic
+parfor sr=1:max(unique(source_labels))
+    I=find(source_labels==sr);
+%     figure;plotx(source_data(I,:)')
+    if ~isempty(I)
+        [COEFF, SCORE, LATENT] = pca(source_data(I,:)','Centered',false);
+    %     figure;plotx(SCORE(:,1)*COEFF(:,1)');
+        fra_eigenvalues(sr)=LATENT(1)/sum(LATENT);
+        if fra_eigenvalues(sr) > 0.5
+            ave_source_data=[ave_source_data mean(source_data(I,:)',2)];
+            agr_source_data=[agr_source_data SCORE(:,1)];
+            ave_source_coor=[ave_source_coor; mean(source_fsaverage(I,:),1)];
+            ave_source_label=[ave_source_label; sr];
+        end
+    end
+end
+toc
+figure;
+plot(1:max(unique(source_labels)),fra_eigenvalues,'.','MarkerSize',12);
+yline(0.5)
+xlabel('ROI labels');ylabel('fraction of 1st eigenvalue')
+figure;
+plot3(ave_source_coor(1:230,1),ave_source_coor(1:230,2),ave_source_coor(1:230,3),'r.');hold on;
+plot3(ave_source_coor(231:end,1),ave_source_coor(231:end,2),ave_source_coor(231:end,3),'b.');
+%%
+sr=68
+I=find(source_labels==sr);
+  figure;plotx(source_data(I,:)')
+if ~isempty(I)
+    [COEFF, SCORE, LATENT] = pca(source_data(I,:)','Centered',false);
+%     figure;plotx(SCORE(:,1)*COEFF(:,1)');
+    fra_eigenvalues(sr)=LATENT(1)/sum(LATENT);
+    if fra_eigenvalues(sr) > 0.5
+        ave_source_data=[ave_source_data mean(source_data(I,:)',2)];
+        ave_source_coor=[ave_source_coor; mean(source_fsaverage(I,:),1)];
+        ave_source_label=[ave_source_label; sr];
+    end
+end
+%%
+% save('agr_source.mat','ave_source_data','agr_source_data','ave_source_coor','ave_source_label');
+save('agr_source.mat','agr_source_data','ave_source_coor','ave_source_label');

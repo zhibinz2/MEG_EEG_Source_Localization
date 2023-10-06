@@ -69,3 +69,5 @@ EEG_spacing_32chan/20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data2.mat
 EEG_spacing_32chan/20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data3.mat
 EEG_spacing_32chan/20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data4.mat
 EEG_spacing_32chan/20220713_method_MNE_ico_4_scale_0.05_depth_0.8_st.data5.mat
+EEG_32chan_pca/agr_source.mat
+EEG_spacing_32chan_R/agr_source.mat
