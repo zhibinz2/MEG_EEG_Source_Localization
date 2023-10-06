@@ -23,6 +23,7 @@ dubious_chans=[];
 ch_dubious=[];
 
 %% save
+
 Fs=2000;
 % select trial and subject
 trial=1;
