@@ -242,7 +242,7 @@ load('preprocessed_eeg.mat')
 load('20220804_scale_0.05_depth_0.8.mat')
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util
 addpath /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util
-[inversemat, stat,reconstructed] = inversemodel(leadfield,'prctile',1);
+[inversemat, stat, reconstructed] = inversemodel(leadfield,'prctile',1);
 source_data=inversemat*preprocessed_eeg;
 
 tic
