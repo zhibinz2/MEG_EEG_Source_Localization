@@ -80,7 +80,7 @@ toc % # 1 m or 4.2s
 figure;imagesc(network);colorbar;colormap('jet')
 
 %% Decifer AGL function -- estBestPenalizationQUIC
-[network,penalizationIn, penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
+[network,penalizationIn,penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
 % output: network,penalizationIn, penalizationOut,minInd,allDevsReturn
 
 % input: data,SC,allLambdas,allLambdasOut, flagForReal
@@ -115,7 +115,7 @@ tic
 for mins = 1:n_ensam   % 4 or 2 ensembles for cross validation
     
     parfor lambda = 1:n_Lambdas % loop through lambdas In. Let's pick: lambda = 2
-        dataCov = cov(squeeze(data(mins,:,:))'); % 228 x 228
+        dataCov = cov(squeeze(data(mins,:,:))'); % 228 x 228 or 888 x 888
         % scalingVal = max(max(triu(abs(dataCov),1)));
         scalingVal = max(triu(abs(dataCov),1),[],'all'); % maximum value of the cov
         tmpDev = zeros(length(allLambdasOut),n_ensam); % 13x4 deviance 
@@ -344,8 +344,8 @@ clear network networkPrecCompTrue penInCompTrue penOutCompTrue minInd allDevsRet
 % # 11448.750612 seconds.
 % figure;imagesc(networkPrecCompTrue);colorbar;colormap('jet')
 [network,penalizationIn, penalizationOut,minInd,allDevsReturn] = ...
-    New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut)
-toc % 1357s or 1082s
+    New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut);
+toc % 1357s -> 1034s 
 figure;imagesc(network);colorbar;colormap('jet');
 title('AGL output')
 

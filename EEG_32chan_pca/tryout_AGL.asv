@@ -80,7 +80,7 @@ toc % # 1 m or 4.2s
 figure;imagesc(network);colorbar;colormap('jet')
 
 %% Decifer AGL function -- estBestPenalizationQUIC
-[network,penalizationIn, penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
+[network,penalizationIn,penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
 % output: network,penalizationIn, penalizationOut,minInd,allDevsReturn
 
 % input: data,SC,allLambdas,allLambdasOut, flagForReal
@@ -115,7 +115,7 @@ tic
 for mins = 1:n_ensam   % 4 or 2 ensembles for cross validation
     
     parfor lambda = 1:n_Lambdas % loop through lambdas In. Let's pick: lambda = 2
-        dataCov = cov(squeeze(data(mins,:,:))'); % 228 x 228
+        dataCov = cov(squeeze(data(mins,:,:))'); % 228 x 228 or 888 x 888
         % scalingVal = max(max(triu(abs(dataCov),1)));
         scalingVal = max(triu(abs(dataCov),1),[],'all'); % maximum value of the cov
         tmpDev = zeros(length(allLambdasOut),n_ensam); % 13x4 deviance 
@@ -275,7 +275,7 @@ downsample = 10;
 passbands = [1 3; 3.5 6.5; 7 10; 10.5 13.5; 14 20; 21 29; 30 49.5];
 bandlabels = {'Delta', 'Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2', 'Gamma'};
 % Select frequency
-freqBand=3;
+freqBand=6;
 attenuation=60;
 passFreq1 = passbands(freqBand,1);
 passFreq2 = passbands(freqBand,2);
@@ -296,7 +296,7 @@ coh=cov(hilbertdata');
 covMat = real2Complex(coh,1);% it doesn't convert to real 
 % correlation
 cor=corrcoef(ampdata');
-% imagesc(cor);colorbar;colormap("jet");
+% imagesc(cor);colorbar;colormap("jet");title('amplitude correlation');subtitle('beta2')
 
 sourceDataReal = cat(1,real(hilbertdata),imag(hilbertdata));    
 sourceDataReal = sourceDataReal*(1/mean(abs(sourceDataReal(:)))); % normalize data
@@ -310,12 +310,12 @@ n_sr=size(sourceDataReal,1); % number of sources/variables
 sourceDataReal = [sourceDataReal(:,1:sam_size)]';
 datareshaped = reshape(sourceDataReal, sam_len, n_split, n_sr);
 datapermuted = permute(datareshaped,[2,3,1]);
+% imagesc(corrcoef(sourceDataReal));colorbar;colormap("jet");title('correlation');subtitle('beta2')
 
 % examine the permuted data
 ch=1; ensam=1; sam_range=1:sam_len;
 figure;subplot(121);plot(sam_range,sourceDataReal(sam_range,ch),'r');
 subplot(122); plot(sam_range,squeeze(datapermuted(ensam,ch,sam_range)),'b');
-
 
 % load SC
 load('../../Virtual-Tractography/ForZhibin/processed_data/scale250_Connectome.mat');
@@ -344,9 +344,10 @@ clear network networkPrecCompTrue penInCompTrue penOutCompTrue minInd allDevsRet
 % # 11448.750612 seconds.
 % figure;imagesc(networkPrecCompTrue);colorbar;colormap('jet')
 [network,penalizationIn, penalizationOut,minInd,allDevsReturn] = ...
-    New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut)
-toc % 1357s
-figure;imagesc(network);colorbar;colormap('jet')
+    New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut);
+toc % 1357s -> 1034s 
+figure;imagesc(network);colorbar;colormap('jet');
+title('AGL output')
 
 %% https://www.mathworks.com/help/parallel-computing/run-matlab-functions-on-a-gpu.html
 

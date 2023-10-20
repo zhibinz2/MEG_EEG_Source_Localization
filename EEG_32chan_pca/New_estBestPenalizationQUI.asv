@@ -1,4 +1,4 @@
-function [X,penalizationIn, penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
+function [network,penalizationIn, penalizationOut,minInd,allDevsReturn] = New_estBestPenalizationQUI(data,SC,allLambdas,allLambdasOut)
 % This is a reorganized version of Ani Wodeyar's estBestPenalizationQUIC
 % function. It is modified to work with only real value input data.
 
@@ -61,10 +61,10 @@ for mins = 1:n_ensam   % loop through ensembles for cross validation
             In_network = current_lamdaIn*scalingVal*GforFit;
             Out_network = current_lamdaOut*scalingVal*(double(~(GforFit))-eye(length(GforFit)));
             diag_network = min_LamdaIn*scalingVal*eye(length(GforFit));
-            X = QUIC('default', dataCov,In_network + Out_network + diag_network, ... 
+            [X] = QUIC('default', dataCov,In_network + Out_network + diag_network, ... 
                  1e-4, 0, 200);
-%             newG = abs(X)>0; % convert to boolean
-%             newG1 = reduce2nNetwork(newG); % add up the four logical quadrants
+            newG = abs(X)>0; % convert to boolean
+            newG1 = reduce2nNetwork(newG); % add up the four logical quadrants
 
             % cross validation
             cnt_min = 1;
@@ -120,5 +120,5 @@ Out_network = penalizationOut*scalingVal*(double(~(GforFit))-eye(length(GforFit)
 diag_network = min_LamdaIn*scalingVal*eye(length(GforFit));
 X = QUIC('default', dataCov, In_network +  Out_network + diag_network, ...
      1e-4, 0, 200); 
-% newG = abs(X)>0 ; % convert X to bivariate (logical)
-% network = reduce2nNetwork(newG); % add up the four logical quadrants
+newG = abs(X)>0 ; % convert X to bivariate (logical)
+network = reduce2nNetwork(newG); % add up the four logical quadrants
