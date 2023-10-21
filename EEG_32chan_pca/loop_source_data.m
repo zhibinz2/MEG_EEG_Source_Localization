@@ -1,4 +1,4 @@
-%% source allignment 
+%% source allignment and load some variables
 clear
 seeds=[20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;
         2022100402;20221005];
@@ -26,9 +26,10 @@ for i = 1:length(source_fsaverage)
     label             = parcels(inds); 
     source_labels(i) = label;
 end
+
 % "cuneus 1": 148
-length(unique(source_labels)) % 462 one label not mapped
-find(unique(source_labels)==148)
+% length(unique(source_labels)) % 462 one label not mapped
+% find(unique(source_labels)==148)
 
 % load forward matrix
 load('leadfield.mat');
@@ -38,9 +39,17 @@ addpath /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulati
 [inversemat, stat, reconstructed] = inversemodel(leadfield,'prctile',1);
 % leakage=inversemat*leadfield;
 
+data_path= '../../Cleaned_data/'; % Cleaned EEG data can be found at https://osf.io/rstpu/. 
+% 
+% cd /home/zhibinz2/Documents/GitHub/Cleaned_data
+% 
+% cd /home/zhibinz2/Documents/GitHub/Cleaned_data/source_data
+% for ses=1:12
+%     mkdir(num2str(seeds(ses,:)));
+% end
+
 
 %% loop through all data to compute correlation of the recon EEG with original EEG 
-data_path= '../../Cleaned_data/'; % Cleaned EEG data can be found at https://osf.io/rstpu/. 
 tic
 corr_32_all=zeros(numSes,2,12,32);
 for r=1:numSes
@@ -71,8 +80,8 @@ toc
 
 mean(corr_32_all,4)
 
+%% loop throught all source data to compute pca and aggregate (fraction > 0.5)
 
-%% loop throught all source data to compute pca and aggregate
 for r=1:numSes
     clear runid data preprocessed_eeg EEG_ori source_data EEG_recon leakage
     runid = num2str(seeds(r,:));
@@ -115,7 +124,51 @@ for r=1:numSes
 end
 % 9 h
 
+%% loop throught all source data to compute pca and aggregate (all ROIs)
+for r=1:numSes
+    vars = ({'runid', 'data preprocessed_eeg', 'EEG_ori', 'source_data', 'EEG_recon', 'leakage'});
+    clear(vars{:});
+    runid = num2str(seeds(r,:));
+    % data=load([data_path  'clean_' runid '.mat']);
+    data=load([data_path  'clean_' runid '.mat'],'dataL','dataR');
+    for subj=1:2
+        if subj==1
+            preprocessed_eeg=data.dataL;
+        else
+            preprocessed_eeg=data.dataR;
+        end
+        for tr=1:12
+            vars = ({'EEG_ori', 'source_data', 'EEG_recon', 'leakage'});
+            clear(vars{:});
+            tic
+            EEG_ori=preprocessed_eeg{tr}(:,1:32)';
+            source_data=inversemat*EEG_ori;
+            EEG_recon=leadfield*source_data;
+
+            fra_eigenvalues=zeros(1,max(unique(source_labels)));
+            agr_source_data=[];
+            ave_source_coor=[];
+            ave_source_label=[];
+            for sr=1:max(unique(source_labels))
+                I=find(source_labels==sr);
+                if ~isempty(I)
+                    [COEFF, SCORE, LATENT] = pca(source_data(I,:)','Centered',false);
+                    fra_eigenvalues(sr)=LATENT(1)/sum(LATENT);
+                    agr_source_data=[agr_source_data SCORE(:,1)];
+                    ave_source_coor=[ave_source_coor; mean(source_fsaverage(I,:),1)];
+                    ave_source_label=[ave_source_label; sr];
+                end
+            end
+            save([data_path 'source_data/' num2str(runid) '/subj' num2str(subj) '_tr_' num2str(tr)  '.mat'], ...
+                            'fra_eigenvalues','agr_source_data','ave_source_coor','ave_source_label');
+            toc
+        end
+    end
+end
+% 10 h
+
 %% try remove subcortical and "zeros marked" sources not mapped and saved the aggreated source data
+
 sum(fra_eigenvalues==0)
 sum(fra_eigenvalues>0.50)
 roiNames_250(scale250_subcortROIs(2:end))
@@ -127,7 +180,7 @@ fra_eigenvalues(scale250_subcortROIs(2:end))=0
 % end
 
 
-cd /home/zhibinz2/Documents/GitHub/Cleaned_data/cortical_source_data
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/cortical_source_data_0.5
 clear
 seeds=[20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;
         2022100402;20221005];
@@ -141,7 +194,7 @@ for ses=1:12
         for tr=1:12
             tic
             clear i agr_source_data ave_source_coor ave_source_label
-            load(['../source_data/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat'])
+            load(['../source_data_0.5/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat'])
             marked_fra_eigenvalues=fra_eigenvalues(ave_source_label);
             bool_temp=zeros(1,length(ave_source_label));
             for i=1:length(ave_source_label)
@@ -188,7 +241,7 @@ max(num_source_all,[],'all')
 
 
 %% loop through all data to compute fraction of the first eigenvalue
-cd /home/zhibinz2/Documents/GitHub/Cleaned_data/source_data
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/source_data_0.5/
 % ses=1; subj=1; tr=5;
 fra_eigenvalues_all=zeros(12,2,12,463);
 for ses =1:12
