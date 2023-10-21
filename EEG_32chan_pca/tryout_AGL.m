@@ -345,7 +345,7 @@ clear network networkPrecCompTrue penInCompTrue penOutCompTrue minInd allDevsRet
 % figure;imagesc(networkPrecCompTrue);colorbar;colormap('jet')
 [network,penalizationIn, penalizationOut,minInd,allDevsReturn] = ...
     New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut);
-toc % 1357s -> 1034s 
+toc % 1357s -> 1034s =
 figure;imagesc(network);colorbar;colormap('jet');
 title('AGL output')
 
