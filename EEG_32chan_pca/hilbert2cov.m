@@ -36,6 +36,8 @@ for ses=1:12
     for subj=1:2
         for tr=1:12
             load(['./cortical_source_data/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat']);
+
+            hilbert_dataCov=cell(1,5);
             for freq=1:5
                 
                 % resample
@@ -49,7 +51,7 @@ for ses=1:12
                 sourceDataReal = cat(1,real(hilbertdata),imag(hilbertdata));
                 sourceDataReal = sourceDataReal*(1/mean(abs(sourceDataReal(:)))); % normalize data
 
-                hilbert_dataCov = cov(sourceDataReal');
+                hilbert_dataCov{freq} = cov(sourceDataReal');
 
                 save(['./hilbert_datacov/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat'],'hilbert_dataCov');
             end
