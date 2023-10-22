@@ -125,7 +125,7 @@ end
 % 9 h
 
 %% loop throught all source data to compute pca and aggregate (all ROIs)
-for r=1:numSes
+for r=8:numSes
     vars = ({'runid', 'data preprocessed_eeg', 'EEG_ori', 'source_data', 'EEG_recon', 'leakage'});
     clear(vars{:});
     runid = num2str(seeds(r,:));
@@ -167,7 +167,8 @@ for r=1:numSes
 end
 % 10 h
 
-%% try remove subcortical and "zeros marked" sources not mapped and saved the aggreated source data
+
+%% Remove 16 subcortical and "zeros marked" sources not mapped and saved the aggreated source data
 
 sum(fra_eigenvalues==0)
 sum(fra_eigenvalues>0.50)
@@ -175,12 +176,12 @@ roiNames_250(scale250_subcortROIs(2:end))
 fra_eigenvalues(scale250_subcortROIs(2:end))=0
 % 463-15=448 cortical sources
 
-% for ses=1:12
-%     mkdir(num2str(seeds(ses,:)));
-% end
+for ses=1:12
+    mkdir(num2str(seeds(ses,:)));
+end
 
 
-cd /home/zhibinz2/Documents/GitHub/Cleaned_data/cortical_source_data_0.5
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/cortical_source_data
 clear
 seeds=[20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;
         2022100402;20221005];
@@ -194,7 +195,7 @@ for ses=1:12
         for tr=1:12
             tic
             clear i agr_source_data ave_source_coor ave_source_label
-            load(['../source_data_0.5/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat'])
+            load(['../source_data/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat'])
             marked_fra_eigenvalues=fra_eigenvalues(ave_source_label);
             bool_temp=zeros(1,length(ave_source_label));
             for i=1:length(ave_source_label)

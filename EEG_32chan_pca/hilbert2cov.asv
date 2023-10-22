@@ -35,7 +35,7 @@ for ses=1:12
     tic
     for subj=1:2
         for tr=1:12
-            load(['./cortical_source_data/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat']);
+            load(['./' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat']);
             for freq=1:5
                 
                 % resample

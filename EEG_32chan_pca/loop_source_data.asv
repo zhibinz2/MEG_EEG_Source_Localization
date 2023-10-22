@@ -125,7 +125,7 @@ end
 % 9 h
 
 %% loop throught all source data to compute pca and aggregate (all ROIs)
-for r=1:numSes
+for r=8:numSes
     vars = ({'runid', 'data preprocessed_eeg', 'EEG_ori', 'source_data', 'EEG_recon', 'leakage'});
     clear(vars{:});
     runid = num2str(seeds(r,:));
@@ -149,7 +149,7 @@ for r=1:numSes
             agr_source_data=[];
             ave_source_coor=[];
             ave_source_label=[];
-            parfor sr=1:max(unique(source_labels))
+            for sr=1:max(unique(source_labels))
                 I=find(source_labels==sr);
                 if ~isempty(I)
                     [COEFF, SCORE, LATENT] = pca(source_data(I,:)','Centered',false);
@@ -165,8 +165,7 @@ for r=1:numSes
         end
     end
 end
-toc
-% 
+% 10 h
 
 %% try remove subcortical and "zeros marked" sources not mapped and saved the aggreated source data
 
