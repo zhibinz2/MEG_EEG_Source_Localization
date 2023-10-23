@@ -240,6 +240,21 @@ for ensam = 1:3
     end
 end
 
+% penaltyselection for 1 subject
+penalizationIn_op1=nan(2,6,5);
+penalizationOut_op1=nan(2,6,5);
+minDev_op1=nan(2,6,5);
+parfor subj=1%:2
+    for dl_ses=1%:6
+        for freq=1:5
+            tic
+            dataCovs_op=squeeze(ave_hilcov_option3(:,subj,dl_ses,freq,:,:));
+            [penalizationIn_op1(subj,dl_ses,freq),penalizationOut_op1(subj,dl_ses,freq),minDev_op1(subj,dl_ses,freq)]=...
+            penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
+            toc
+        end
+    end
+end
 
 
 
