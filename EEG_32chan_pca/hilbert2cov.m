@@ -169,10 +169,10 @@ save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minD
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op1=nan(12,2,12,5,894,894);
-for ses=1:12
+parfor ses=1:12
     for subj=1:2
-        tic
         for tr=1:12
+            tic
             for freq=1:5
                 if ismember(tr,[1 2 3]) % uncouple
                     penalizationIn=penalizationIn_op1(1,freq);
@@ -196,11 +196,12 @@ for ses=1:12
                     [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
                 end
             end
+            toc
         end
-        toc
     end
 end
-
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('X_op1.mat','X_op1')
 
 
 
