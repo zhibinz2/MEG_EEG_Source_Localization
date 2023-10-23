@@ -178,9 +178,6 @@ end
 % Option 2 requires 2 x 12 x 4 x 5 cross-validation (not 72 x 5, estimated 33-38 days).
 % I would vote for Option 1.
 
-
-
-
 %% option 3 By subject
 % We should also save the deviance values for the final fit, because they tell us how good a model it is.
 % Option 3: Choose the penalties for each subject in each frequency band for all conditions.
@@ -191,8 +188,22 @@ end
 % Can you try this for the same frequency you are testing for option 1 in 1 subject.
 
 % In 1 subject first
-
-
+% hilbert_dataCov_all=nan(12,2,12,5,894,894);
+cd ../../Cleaned_data/hilbert_datacov
+ave_hilcov_option3=nan(3,2,6,5,894,894); % 3 ensamble x 2 subjects x 6 double-sessions x 5 frequency x 894 x 894
+for ensam = 1:3
+    for subj =1:2
+        for dl_ses=1:6
+            for freq=1:5
+                tic
+                ave_hilcov_option3(ensam,subj,dl_ses,freq,:,:)=...
+                    squeeze(mean(squeeze(mean(squeeze(hilbert_dataCov_all([1+2*(dl_ses-1):2+2*(dl_ses-1)], ...
+                    subj,[1:3:12]+(ensam-1),freq,:,:)),2)),1));
+                toc
+            end
+        end
+    end
+end
 
 
 
