@@ -163,8 +163,10 @@ for condi=1:4
         toc
     end
 end
+% 13 hours
+save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
 
-
+% fitprecision
 
 
 
