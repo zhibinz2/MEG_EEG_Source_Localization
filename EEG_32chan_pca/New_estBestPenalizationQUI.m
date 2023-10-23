@@ -95,7 +95,7 @@ allDevs(allDevs==0) = NaN;
 allDevsReturn = nanmean(nanmean(allDevs,4),3); % average deviance for each combination of lambda
 
 % find the smallest deviance = smallest penalization
-[~,~] = min(allDevsReturn(:)); % linear index
+[~,ind] = min(allDevsReturn(:)); % linear index
 [I1, I2] = ind2sub([size(allDevsReturn,1), size(allDevsReturn,2)],ind); % convert to subscript index in the 13x13 matrix
 
 % identify the lamda_In value with minimum penalization
