@@ -60,5 +60,148 @@ for ses=1:12
     toc
 end
  
-                
+%% load variables for penalty selection
+clear
+allLambdas = fliplr([.6,.5,.4,.3,.2,.175,.15,.125, .1, .075, .05, .025, .01]); 
+allLambdasOut = fliplr([.6,.5,.4,.3,.2,.175,.15,.125, .1, .075, .05, .025, .01]);
+n_Lambdas=length(allLambdas); % number of lambda values
+min_LamdaIn = min(allLambdas);
 
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/cortical_source_data
+load('corti_ave_source_labl.mat')
+load('corti_ave_source_coor.mat')
+source_labels=corti_ave_source_labl{1,1,1}; % every trial is the same, load one trial
+source_coor=corti_ave_source_coor{1,1,1};
+
+load('../../Virtual-Tractography/ForZhibin/processed_data/scale250_Connectome.mat');
+SC=logical(fc(source_labels,source_labels));
+figure;imagesc(SC);colorbar;colormap('jet')
+
+% GforFit =[double(SC),double(SC) ; double(SC), double(SC)]; % boolean
+% figure;imagesc(GforFit);colorbar;colormap('jet')
+% 
+% n_ensam=size(data,1); % number of ensambles
+
+
+%% Organize hilber_dataCov_all
+seeds=[20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;
+        2022100402;20221005];
+numSes=size(seeds,1);
+
+hilbert_dataCov_all=nan(12,2,12,5,894,894);
+for ses=1:numSes
+    tic
+    clear conditions sortorders
+    runid = num2str(seeds(ses,:));
+    load(['../../Cleaned_data/clean_' runid '.mat'],'conditions');
+    % sort order
+    [x,sortorder]=sort(conditions);
+    for subj=1:2
+        for tr=1:12
+            load(['../../Cleaned_data/hilbert_datacov/' ...
+                    num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(sortorder(tr)) '.mat'] ...
+                    ,'hilbert_dataCov');
+            for freq=1:5
+                hilbert_dataCov_all(ses,subj,tr,freq,:,:)=hilbert_dataCov{freq};
+            end
+        end
+    end
+    toc
+end
+% 1 min
+% cd ../../Cleaned_data/hilbert_datacov/
+% save('hilbert_dataCov_all.mat','hilbert_dataCov_all');
+
+%% option 1 By condition
+% For any one frequency and condition, there are 72 covariance.  
+% They come from  24 sessions (12 subjects x 2).   
+% Lets break this up into 3 groups, each of which has 24 covariance matrix, drawn 1 from each subject and session. 
+% You can think of it as grabbing the first trial for all sessions and subjects and making them 1 group, 
+% the 2nd one is the 2nd group, 3rd one os the 3rd group.
+% If we average those 24 together, then for each frequency band and condition we have 3 covariance matrix. 
+% - put these 3 matrix into penalty selection and do 3 x cross validation to select penalty for that frequency band x condition.
+% If we do it this way, we will have to depend on evaluating weights to compare conditions.
+
+% Option 1 requires doing 4 x 5 cross-validation 
+ave_hilcov_option1=nan(3,4,5,894,894); % 3 ensamble x 4 condition x 5 freq
+for ensam=1:3
+    for freq=1:5
+        tic
+        condi=1; % uncouple
+        ave_hilcov_option1(ensam,condi,freq,:,:)=squeeze(mean(squeeze(mean( ...
+            hilbert_dataCov_all(:,:,ensam+0*3,freq,:,:),1)),1));
+        condi=2; % leading
+        ave_hilcov_option1(ensam,condi,freq,:,:)=squeeze(mean(cat(1, ...
+            squeeze(hilbert_dataCov_all(:,1,ensam+3,freq,:,:)),...
+            squeeze(hilbert_dataCov_all(:,2,ensam+2*3,freq,:,:))),1));
+        condi=3; % following
+        ave_hilcov_option1(ensam,condi,freq,:,:)=squeeze(mean(cat(1, ...
+            squeeze(hilbert_dataCov_all(:,2,ensam+3,freq,:,:)),...
+            squeeze(hilbert_dataCov_all(:,1,ensam+2*3,freq,:,:))),1));
+        condi=4; % mutual
+        ave_hilcov_option1(ensam,condi,freq,:,:)=squeeze(mean(squeeze(mean( ...
+            hilbert_dataCov_all(:,:,ensam+3*3,freq,:,:),1)),1));
+        toc
+    end
+end
+% 15 s
+size(ave_hilcov_option1)
+
+addpath(genpath('/../../AdaptiveGraphicalLassoforParCoh/Simulations/util'))
+addpath(genpath('../../AdaptiveGraphicalLassoforParCoh/AGL'))
+
+% penaltyselection
+penalizationIn_op1=nan(4,5);
+penalizationOut_op1=nan(4,5);
+minDev_op1=nan(4,5);
+for condi=1:4
+    for freq=1:5
+        tic
+        dataCovs_op=squeeze(ave_hilcov_option1(:,condi,freq,:,:));
+        [penalizationIn_op1(condi,freq),penalizationOut_op1(condi,freq),minDev_op1(condi,freq)]=...
+            penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
+        toc
+    end
+end
+
+
+
+
+
+
+
+%% Option 2:
+% On each session there are 3 trials in 1 condition.  
+% Get 3 covariance matrix, put them in cross-validation to select penalty.  
+% Run all 3 trials at that penalty.  This would require doing 72 x 5 cross-validation models.  
+% But, we would be less dependent on weights.
+% Option 2 requires 2 x 12 x 4 x 5 cross-validation (not 72 x 5, estimated 33-38 days).
+% I would vote for Option 1.
+
+
+
+
+%% option 3 By subject
+% We should also save the deviance values for the final fit, because they tell us how good a model it is.
+% Option 3: Choose the penalties for each subject in each frequency band for all conditions.
+% Each subject produces 24 trials, 3 in each condition.  So take 1 trial of each condition (8 trials 4 from each day) 
+% and average covariance.  now you have 3 covariance matrices.  run the penalty selection function. .
+% Go back and fit  each trial for that subject using that penalty.
+% This way you would have to 12 x 5 penality optimizations.  But, I think this may be better, because the subject to subject differences may be greater than the conditon differences.
+% Can you try this for the same frequency you are testing for option 1 in 1 subject.
+
+% In 1 subject first
+
+
+
+
+
+
+
+%% test X * cov and ggmFitHtf
+cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
+
+
+%% Other
+% two papers
+% drawmesh display the motor connections

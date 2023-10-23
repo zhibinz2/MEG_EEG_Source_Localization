@@ -1,4 +1,4 @@
-function [penalizationIn,penalizationOut,minDev] = penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op)
+function [X,penalizationIn,penalizationOut,minDev] = penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op)
 % This function runs cross validation for penalty selection
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
