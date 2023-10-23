@@ -1,4 +1,4 @@
-function [X] = fitprecision(SC,penalizationIn,penalizationOut,dataCov)
+function [X] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov)
 % This function fit precison for each trial
 
 GforFit =[double(SC),double(SC) ; double(SC), double(SC)]; % boolean

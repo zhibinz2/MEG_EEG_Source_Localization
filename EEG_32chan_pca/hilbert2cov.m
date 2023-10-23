@@ -167,7 +167,39 @@ end
 save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
 
 % fitprecision
-
+% hilbert_dataCov_all=nan(12,2,12,5,894,894);
+X_op1=nan(12,2,12,5,894,894);
+for ses=1:12
+    for subj=1:2
+        tic
+        for tr=1:12
+            for freq=1:5
+                if ismember(tr,[1 2 3]) % uncouple
+                    penalizationIn=penalizationIn_op1(1,freq);
+                    penalizationOut=penalizationOut_op1(1,freq);
+                    dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                    [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+                elseif (ismember(tr,[4:6]) & subj==1) | (ismember(tr,[7:9]) & subj==2) % leading
+                    penalizationIn=penalizationIn_op1(2,freq);
+                    penalizationOut=penalizationOut_op1(2,freq);
+                    dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                    [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+                elseif (ismember(tr,[4:6]) & subj==2) | (ismember(tr,[7:9]) & subj==1) % following
+                    penalizationIn=penalizationIn_op1(3,freq);
+                    penalizationOut=penalizationOut_op1(3,freq);
+                    dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                    [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+                else ismember(tr,[10:12])
+                    penalizationIn=penalizationIn_op1(4,freq);
+                    penalizationOut=penalizationOut_op1(4,freq);
+                    dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                    [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+                end
+            end
+        end
+        toc
+    end
+end
 
 
 
@@ -213,7 +245,7 @@ end
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
-
+open estBestPenalizationQUIC.m
 
 %% Other
 % two papers

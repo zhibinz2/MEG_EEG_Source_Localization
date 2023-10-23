@@ -163,9 +163,28 @@ for condi=1:4
         toc
     end
 end
+% 13 hours
+save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
 
-
-
+% fitprecision
+% hilbert_dataCov_all=nan(12,2,12,5,894,894);
+X_op1=nan(12,2,12,5,894,894);
+for ses=1:12
+    for subj=1:2
+        tic
+        for tr=1:12
+            for freq=1:5
+                if ismember(tr,[1 2 3]) % uncouple
+                    penalizationIn=penalizationIn_op1(1,freq);
+                    penalizationOut=penalizationOut_op1(1,freq);
+                    dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                    [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,dataCov);
+                elseif (ismember(tr,[3:5]) & subj==1) | (ismember(tr,[6:5]) & subj==1)
+            end
+        end
+        toc
+    end
+end
 
 
 
@@ -195,9 +214,15 @@ for ensam = 1:3
     for subj =1:2
         for dl_ses=1:6
             for freq=1:5
-                condi=1; % uncouple
+                tic
                 ave_hilcov_option3(ensam,subj,dl_ses,freq,:,:)=...
-                    squeeze(mean(squeeze(hilbert_dataCov_all([1+2*(dl_ses-1):2+2*(dl_ses-1)],subj,[1:3:12]+(ensam-1),freq,:,:)),2));
+                    squeeze(mean(squeeze(mean(squeeze(hilbert_dataCov_all([1+2*(dl_ses-1):2+2*(dl_ses-1)], ...
+                    subj,[1:3:12]+(ensam-1),freq,:,:)),2)),1));
+                toc
+            end
+        end
+    end
+end
 
 
 
@@ -205,7 +230,7 @@ for ensam = 1:3
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
-
+open estBestPenalizationQUIC.m
 
 %% Other
 % two papers
