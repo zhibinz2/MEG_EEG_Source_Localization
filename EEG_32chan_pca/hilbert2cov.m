@@ -266,6 +266,7 @@ parfor subj=1%:2
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
             penalizationOut=penalizationOut_op3(subj,dl_ses,freq);
+            dataCovs_op
             for tr=1:12
                 tic
                 ses=1+2*(dl_ses-1);
@@ -279,7 +280,7 @@ parfor subj=1%:2
         end
     end
 end
-save('X_op3_subj_1_dl_ses_1.mat','X_op3')
+save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
