@@ -266,7 +266,6 @@ parfor subj=1%:2
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
             penalizationOut=penalizationOut_op3(subj,dl_ses,freq);
-            dataCovs_op
             for tr=1:12
                 tic
                 ses=1+2*(dl_ses-1);
