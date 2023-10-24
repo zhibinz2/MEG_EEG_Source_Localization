@@ -169,27 +169,27 @@ save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minD
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op1=nan(12,2,12,5,894,894);
-parfor ses=1:12
+parfor ses=1:2%12
     for subj=1:2
         for tr=1:12
             tic
             for freq=1:5
-                if ismember(tr,[1 2 3]) % uncouple
+                if ismember(tr,[1 2 3]); % uncouple
                     penalizationIn=penalizationIn_op1(1,freq);
                     penalizationOut=penalizationOut_op1(1,freq);
                     dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
                     [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
-                elseif (ismember(tr,[4:6]) & subj==1) | (ismember(tr,[7:9]) & subj==2) % leading
+                elseif (ismember(tr,[4:6]) & subj==1) | (ismember(tr,[7:9]) & subj==2); % leading
                     penalizationIn=penalizationIn_op1(2,freq);
                     penalizationOut=penalizationOut_op1(2,freq);
                     dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
                     [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
-                elseif (ismember(tr,[4:6]) & subj==2) | (ismember(tr,[7:9]) & subj==1) % following
+                elseif (ismember(tr,[4:6]) & subj==2) | (ismember(tr,[7:9]) & subj==1); % following
                     penalizationIn=penalizationIn_op1(3,freq);
                     penalizationOut=penalizationOut_op1(3,freq);
                     dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
                     [X_op1(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
-                else ismember(tr,[10:12])
+                else ismember(tr,[10:12]);
                     penalizationIn=penalizationIn_op1(4,freq);
                     penalizationOut=penalizationOut_op1(4,freq);
                     dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
@@ -200,6 +200,7 @@ parfor ses=1:12
         end
     end
 end
+% 40 hour
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 save('X_op1.mat','X_op1')
 
@@ -256,7 +257,25 @@ parfor subj=1%:2
     end
 end
 
-
+% fitprecision
+% hilbert_dataCov_all=nan(12,2,12,5,894,894);
+X_op3=nan(12,2,12,5,894,894);
+parfor subj=1%:2
+    for dl_ses=1%:6
+        for freq=1:5
+            penalizationIn=penalizationIn_op1(subj,dl_ses,freq);
+            penalizationOut=penalizationOut_op1(subj,dl_ses,freq);
+            for tr=1:12
+                ses=1+2*(dl_ses-1);
+                dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                [X_op3(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+                ses=2+2*(dl_ses-1);
+                dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+                [X_op3(ses,subj,tr,freq,:,:)] = fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);
+            end
+        end
+    end
+end
 
 
 %% test X * cov and ggmFitHtf
