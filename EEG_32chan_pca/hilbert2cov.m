@@ -200,7 +200,7 @@ parfor ses=1:2%12
         end
     end
 end
-% 40 hour
+% total estimated 40 hour (2 sessions 6.6 hours)
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 save('X_op1.mat','X_op1')
 
