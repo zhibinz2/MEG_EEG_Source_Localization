@@ -13,6 +13,15 @@ load('parcels.mat') % This is the labels
 x_shift=(max(Vertex(:,1))-max(source_rr(:,1))*1e3)/2+(min(Vertex(:,1))-min(source_rr(:,1))*1e3)/2;
 y_shift=(max(Vertex(:,2))-max(source_rr(:,2))*1e3)/2+(min(Vertex(:,2))-min(source_rr(:,2))*1e3)/2;
 z_shift=(max(Vertex(:,3))-max(source_rr(:,3))*1e3)/2+(min(Vertex(:,3))-min(source_rr(:,3))*1e3)/2;
+% x_shift=(max(Vertex(:,1))-max(source_rr(:,1))*1e3)/3+(min(Vertex(:,1))-min(source_rr(:,1))*1e3)/3+...
+%         (mean(Vertex(:,1))-mean(source_rr(:,1))*1e3)/3;
+% y_shift=(max(Vertex(:,2))-max(source_rr(:,2))*1e3)/3+(min(Vertex(:,2))-min(source_rr(:,2))*1e3)/3+...
+%         (mean(Vertex(:,2))-mean(source_rr(:,2))*1e3)/3;
+% z_shift=(max(Vertex(:,3))-max(source_rr(:,3))*1e3)/3+(min(Vertex(:,3))-min(source_rr(:,3))*1e3)/3+...
+%         (mean(Vertex(:,3))-mean(source_rr(:,3))*1e3)/3;
+% x_shift=(mean(Vertex(:,1))-mean(source_rr(:,1))*1e3);
+% y_shift=(mean(Vertex(:,2))-mean(source_rr(:,2))*1e3);
+% z_shift=(mean(Vertex(:,3))-mean(source_rr(:,3))*1e3);
 source_x=source_rr(:,1) * 1e3 + x_shift;
 source_y=source_rr(:,2) * 1e3 + y_shift;
 source_z=source_rr(:,3) * 1e3 + z_shift;
@@ -21,15 +30,28 @@ num_source=size(source_xyz,1);
 source_fsaverage = source_xyz+127.5; % 127.5 is based on the fsaverage volume being 256 x 256 x 256
 source_labels=zeros(num_source,1);
 for i = 1:length(source_fsaverage)
-    vox = ceil(source_fsaverage(i,:));
+    vox = floor(source_fsaverage(i,:)); % change from ceil to floor,now we have 2 subcortical not mapped
     inds              = sub2ind([size(parcels)], vox(1), vox(2), vox(3));
     label             = parcels(inds); 
     source_labels(i) = label;
 end
 
 % "cuneus 1": 148
-% length(unique(source_labels)) % 462 one label not mapped
-% find(unique(source_labels)==148)
+% length(sort(unique(source_labels))) % 463+1-462 labels not mapped
+% find which label
+roiNames_250(setdiff(1:463,unique(source_labels)))
+% find(unique(source_labels)==225)
+% "Right-Caudate": 225
+% "Right-Pallidum": 227
+
+figure
+clf
+scatter3(Vertex(:,1),Vertex(:,2),Vertex(:,3),'g.')
+clear alpha
+alpha(.1)
+hold on;
+scatter3(source_x,source_y,source_z,'r')
+xlabel('x'); ylabel('y');zlabel('z')
 
 % load forward matrix
 load('leadfield.mat');

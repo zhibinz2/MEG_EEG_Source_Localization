@@ -261,7 +261,7 @@ end
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op3=nan(12,2,12,5,894,894);
-parfor subj=1%:2
+for subj=1%:2
     for dl_ses=1%:6
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
@@ -279,7 +279,43 @@ parfor subj=1%:2
         end
     end
 end
-save('X_op3_subj_1_dl_ses_1.mat','X_op3');
+% save('X_op3_subj_1_dl_ses_1.mat','X_op3');
+% teest
+% tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
+
+%% Compare subj=1, ses=1:2 of option 1 and 3
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+
+condi=1;freq=5;
+penalizationIn_op1(condi,freq)
+penalizationOut_op1(condi,freq)
+minDev_op1(condi,freq)
+
+subj=1;dl_ses=1;freq=5;
+penalizationIn_op3(subj,dl_ses,:)
+penalizationOut_op3(subj,dl_ses,:)
+minDev_op3(subj,dl_ses,:)
+
+
+load('penaltyselection_op1.mat')
+load('penaltyselection_op3.mat')
+
+ses=1; subj=1;
+freq=3;
+tr=11;
+
+cmin=-0.001;cmax=0.001;
+figure;
+clf;
+subplot(121);
+imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+title(['option 1 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
+clim([cmin cmax])
+subplot(122);
+imagesc(squeeze(X_op3(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+title(['option 1 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
+clim([cmin cmax])
+
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL

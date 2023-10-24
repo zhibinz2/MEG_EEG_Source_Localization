@@ -261,7 +261,7 @@ end
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op3=nan(12,2,12,5,894,894);
-parfor subj=1%:2
+for subj=1%:2
     for dl_ses=1%:6
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
@@ -279,7 +279,13 @@ parfor subj=1%:2
         end
     end
 end
-save('X_op3_subj_1_dl_ses_1.mat','X_op3');
+% save('X_op3_subj_1_dl_ses_1.mat','X_op3');
+X_op3
+% teest
+% tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
+
+
+
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
