@@ -291,8 +291,8 @@ end
 % In 1 subject first
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 cd ../../Cleaned_data/hilbert_datacov
-ave_hilcov_option4=nan(3,5); % 5 frequency x 3 ensamble x 894 x 894
-ses=1; subj=1;tr=1:3;
+ave_hilcov_option4=nan(5,894,894); % 5 frequency x 3 ensamble x 894 x 894
+ses=1; subj=1; tr=1:3;
 for freq=1:5
     ave_hilcov_option4(freq,:,:,:)=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
 end
