@@ -283,6 +283,33 @@ end
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
 
+%% option 4
+% By comparison, if you just take 3 trials and 1 subject in 1 condition, 
+% and do cross-validation what is the penalty inside and outside.
+% penaltyselection for 1 subject
+
+% In 1 subject first
+% hilbert_dataCov_all=nan(12,2,12,5,894,894);
+cd ../../Cleaned_data/hilbert_datacov
+ave_hilcov_option4=nan(3,5); % 5 frequency x 3 ensamble x 894 x 894
+ses=1; subj=1;tr=1:3;
+for freq=1:5
+    ave_hilcov_option4(freq,:,:,:)=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+end
+
+
+penalizationIn_op3=nan(5);
+penalizationOut_op3=nan(5);
+minDev_op3=nan(5);
+for freq=1:5
+    tic
+    dataCovs_op=squeeze(ave_hilcov_option4(freq,:,:,:));
+    [penalizationIn_op3(freq),penalizationOut_op3(freq),minDev_op3(freq)]=...
+    penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
+    toc
+end
+
+
 %% Compare subj=1, ses=1:2 of option 1 and 3
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 
