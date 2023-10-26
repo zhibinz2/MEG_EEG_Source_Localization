@@ -245,7 +245,7 @@ end
 penalizationIn_op3=nan(2,6,5);
 penalizationOut_op3=nan(2,6,5);
 minDev_op3=nan(2,6,5);
-parfor subj=1%:2
+parfor subj=2%:2
     for dl_ses=1%:6
         for freq=1:5
             tic
@@ -257,11 +257,12 @@ parfor subj=1%:2
     end
 end
 % 28000/3600= 8 h x 12 = 72 hours
+save('penaltyselection_op3_subj_2_dl_ses_1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
 
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op3=nan(12,2,12,5,894,894);
-for subj=1%:2
+for subj=2%:2
     for dl_ses=1%:6
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
@@ -279,6 +280,7 @@ for subj=1%:2
         end
     end
 end
+save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v6')
 % save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
@@ -392,6 +394,11 @@ imagesc(dataCov);colorbar;
 imagesc(eye(894));colorbar;
 vlim=0.1;
 clim([-1*vlim vlim]);
+
+% try real2Complex
+Q=
+
+covMat_complex = real2Complex(X, 0);
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
