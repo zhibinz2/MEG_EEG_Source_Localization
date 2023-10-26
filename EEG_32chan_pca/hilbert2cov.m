@@ -396,9 +396,11 @@ vlim=0.1;
 clim([-1*vlim vlim]);
 
 % try real2Complex
-Q=
-
 covMat_complex = real2Complex(X, 0);
+
+%% compare the number of edges
+
+
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
