@@ -169,7 +169,7 @@ save('penaltyselection_op1.mat','penalizationOut_op1','penalizationIn_op1','minD
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 X_op1=nan(12,2,12,5,894,894);
-parfor ses=1:2%12
+parfor ses=1:2 % 12
     for subj=1:2
         for tr=1:12
             tic
@@ -200,7 +200,7 @@ parfor ses=1:2%12
         end
     end
 end
-% total estimated 40 hour (2 sessions 6.6 hours)
+% total estimated 40 hour (2 sessions 6.6 hours) 
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 save('X_op1.mat','X_op1')
 
@@ -256,7 +256,7 @@ parfor subj=1%:2
         end
     end
 end
-% 28000/3600= 8 h
+% 28000/3600= 8 h x 12 = 72 hours
 
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
@@ -282,6 +282,7 @@ end
 % save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
+% estimated for all 100*2*5*6*2/3600 = 3 hours
 
 %% option 4
 % By comparison, if you just take 3 trials and 1 subject in 1 condition, 
@@ -297,17 +298,17 @@ for freq=1:5
     ave_hilcov_option4(freq,:,:,:)=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
 end
 
-penalizationIn_op3=nan(5);
-penalizationOut_op3=nan(5);
-minDev_op3=nan(5);
+penalizationIn_op4=nan(5,1);
+penalizationOut_op4=nan(5,1);
+minDev_op4=nan(5,1);
 for freq=1:5
     tic
     dataCovs_op=squeeze(ave_hilcov_option4(freq,:,:,:));
-    [penalizationIn_op3(freq),penalizationOut_op3(freq),minDev_op3(freq)]=...
+    [penalizationIn_op4(freq),penalizationOut_op4(freq),minDev_op4(freq)]=...
     penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
     toc
 end
-
+save('penaltyselection_op4.mat','penalizationIn_op4','penalizationOut_op4','minDev_op4')
 
 %% Compare subj=1, ses=1:2 of option 1 and 3
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
@@ -326,22 +327,71 @@ minDev_op3(subj,dl_ses,:)
 load('penaltyselection_op1.mat')
 load('penaltyselection_op3.mat')
 
+load('X_op1_ses_1-2.mat')
+load('X_op3_subj_1_dl_ses_1.mat')
+
 ses=1; subj=1;
 freq=3;
 tr=11;
-
+% compare the precision output from op1 and op3
 cmin=-0.001;cmax=0.001;
 figure;
 clf;
-subplot(121);
+subplot(131);
 imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
 title(['option 1 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
 clim([cmin cmax])
-subplot(122);
+
+subplot(132);
 imagesc(squeeze(X_op3(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-title(['option 1 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
+title(['option 3 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
 clim([cmin cmax])
 
+subplot(133);
+imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:))-squeeze(X_op3(ses,subj,tr,freq,:,:))); colormap('jet');colorbar;
+title(['option 1-3 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
+clim([cmin cmax])
+
+% sum(diag(logical(squeeze(X_op3(ses,subj,tr,freq,:,:)))))
+% (sum(logical(squeeze(X_op1(ses,subj,tr,freq,:,:))),'all')-894)/2
+% sum(triu(logical(squeeze(X_op1(ses,subj,tr,freq,:,:)))),'all')-894
+
+% compare 5 frequency in op1 and op3
+figure;clf;
+ses=1; subj=1;
+tr=11;
+cmin=-0.001;cmax=0.001;
+for freq=1:5
+    subplot(2,5,freq);
+    imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+    title(['option 1 freq ' num2str(freq)]);
+    clim([cmin cmax]);
+    subplot(2,5,5+freq);
+    imagesc(squeeze(X_op3(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+    title(['option 3 freq ' num2str(freq)]);
+    clim([cmin cmax]);
+end
+sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
+
+% compare op1 (across subj) and op3 (across condition)
+figure;
+subplot(2,)
+
+% try X*dataCov and see if = identity?
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('hilbert_dataCov_all.mat')
+load('X_op3_subj_1_dl_ses_1.mat')
+subj=1;dl_ses=1;freq=5;
+tr=1;
+ses=1+2*(dl_ses-1);
+dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
+X=squeeze(X_op3(ses,subj,tr,freq,:,:));
+imagesc(X.*dataCov);colorbar;
+imagesc(X);colorbar;
+imagesc(dataCov);colorbar;
+imagesc(eye(894));colorbar;
+vlim=0.1;
+clim([-1*vlim vlim]);
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
