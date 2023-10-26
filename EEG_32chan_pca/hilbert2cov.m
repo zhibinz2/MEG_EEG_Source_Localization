@@ -280,7 +280,7 @@ for subj=2%:2
         end
     end
 end
-save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v6')
+save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v6');
 % save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
