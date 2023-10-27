@@ -280,7 +280,7 @@ for subj=2%:2
         end
     end
 end
-save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v6');
+save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v7.3');
 % save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
@@ -375,11 +375,99 @@ for freq=1:5
 end
 sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
 
-% compare op1 (across subj) and op3 (across condition)
-figure;
-subplot(2,)
 
-% try X*dataCov and see if = identity?
+% compare the number of edges
+addpath(genpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util'));
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('X_op1_ses_1-2.mat')
+% load('X_op3_subj_1_dl_ses_1.mat')
+% X_op3_ses_1_2=nan(12,2,12,5,894,894);
+% X_op3_ses_1_2(1:2,1,:,:,:,:)=X_op3(1:2,1,:,:,:,:);
+% load('X_op3_subj_2_dl_ses_1.mat');
+% X_op3_ses_1_2(1:2,2,:,:,:,:)=X_op3(1:2,2,:,:,:,:);
+% save('X_op3_ses_1_2.mat','X_op3_ses_1_2','-v7.3');
+load('X_op3_ses_1_2.mat')
+
+NedgeIn_op1=nan(12,2,12,5);
+NedgeOut_op1=nan(12,2,12,5);
+NedgeIn_op3=nan(12,2,12,5);
+NedgeOut_op3=nan(12,2,12,5);
+for ses =1:2
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                newG = reduce2nNetwork(logical(squeeze(X_op1(ses,subj,tr,freq,:,:))));
+                NedgeIn_op1(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
+                NedgeOut_op1(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
+                newG = reduce2nNetwork(logical(squeeze(X_op3_ses_1_2(ses,subj,tr,freq,:,:))));
+                NedgeIn_op3(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
+                NedgeOut_op3(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
+            end
+        end
+    end
+end
+
+figure;
+for ses=1:2
+    for subj=1:2
+        for tr=1:12
+            if subj==1;
+                subplot(4,12,(ses-1)*12+tr)
+            elseif subj==2;
+                subplot(4,12,(ses+1)*12+tr)
+            end
+            hold on;
+            plot(1:5,squeeze(NedgeIn_op1(ses,subj,tr,:)),'g');
+            plot(1:5,squeeze(NedgeOut_op1(ses,subj,tr,:)),'r');
+            plot(1:5,squeeze(NedgeIn_op3(ses,subj,tr,:)),'b');
+            plot(1:5,squeeze(NedgeOut_op3(ses,subj,tr,:)),'m');
+            ylabel('n edges')
+            xlabel('frequency band')
+            title(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
+            xticks([1:5])
+            xticklabels(bandlabels)
+            hold off;
+            if ses==1 && subj==1 && tr==1;
+                legend({'op1 in','op1 out','op3 in', 'op3 out'},'location','northwest');
+            end
+        end
+    end
+end
+
+
+% compare op1 (across subj) and op3 (across condition)
+std_subj_NedgeIn_op1=nan(2,5);
+std_subj_NedgeOut_op1=nan(2,5);
+mean_subj_NedgeIn_op1=nan(2,5);
+mean_subj_NedgeOut_op1=nan(2,5);
+for subj=1:2
+    for freq=1:5
+        % std(reshape(NedgeIn_op1(1:2,subj,:,freq),[],1))
+        std_subj_NedgeIn_op1(subj,freq)=std(NedgeIn_op1(1:2,subj,:,freq),0,'all');
+        std_subj_NedgeOut_op1(subj,freq)=std(NedgeOut_op1(1:2,subj,:,freq),0,'all');
+        mean_subj_NedgeIn_op1(subj,freq)=mean(NedgeIn_op1(1:2,subj,:,freq),'all');
+        mean_subj_NedgeOut_op1(subj,freq)=mean(NedgeOut_op1(1:2,subj,:,freq),'all');
+    end
+end
+
+
+std_condi_NedgeIn_op3=nan(4,5);
+std_condi_NedgeOut_op3=nan(4,5);
+mean_condi_NedgeIn_op3=nan(4,5);
+mean_condi_NedgeOut_op3=nan(4,5);
+for condi=1:4
+    for freq=1:5
+        std_condi_NedgeIn_op3(condi,freq)=std(NedgeIn_op3(1:2,:,[1:3]+3*(condi-1),freq),0,'all');
+        std_condi_NedgeOut_op3(condi,freq)=std(NedgeOut_op3(1:2,:,[1:3]+3*(condi-1),freq),0,'all');
+        mean_condi_NedgeIn_op3(condi,freq)=mean(NedgeIn_op3(1:2,:,[1:3]+3*(condi-1),freq),'all');
+        mean_condi_NedgeOut_op3(condi,freq)=mean(NedgeOut_op3(1:2,:,[1:3]+3*(condi-1),freq),'all');
+    end
+end
+
+
+
+
+% try X*dataCov and see if = identity
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('hilbert_dataCov_all.mat')
 load('X_op3_subj_1_dl_ses_1.mat')
@@ -397,8 +485,6 @@ clim([-1*vlim vlim]);
 
 % try real2Complex
 covMat_complex = real2Complex(X, 0);
-
-%% compare the number of edges
 
 
 
