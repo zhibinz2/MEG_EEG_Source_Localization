@@ -245,7 +245,12 @@ diag_network = min_LamdaIn*scalingVal*eye(length(GforFit));
 X = QUIC('default', dataCov, ... 
     In_network +  Out_network + diag_network, ...
      1e-4, 0, 200); % output
-
+% imagesc(dataCov);colorbar;
+% imagesc(X);colorbar;
+% imagesc(dataCov*X);colorbar;
+% imagesc(dataCov.*X);colorbar;
+% imagesc(X*dataCov);colorbar;
+% imagesc(dataCov*inv(dataCov));colorbar;
 
 newG = abs(X)>0 ; % convert X to bivariate (logical)
 % if ~flagForReal
@@ -257,6 +262,9 @@ newG = abs(X)>0 ; % convert X to bivariate (logical)
 
 % network = ggmFitHtf(dataCov+ eye(length(dataCov)) *min(allLambdas)  * max(max(triu(abs(dataCov),1))),GforFit_new);
 network = X; 
+
+% figure;imagesc(X);colorbar;
+% figure;imagesc(network);colorbar;
 
 %% My data
 % load source data
@@ -345,7 +353,7 @@ clear network networkPrecCompTrue penInCompTrue penOutCompTrue minInd allDevsRet
 % figure;imagesc(networkPrecCompTrue);colorbar;colormap('jet')
 [network,penalizationIn, penalizationOut,minInd,allDevsReturn] = ...
     New_estBestPenalizationQUI(datapermuted,SC_tr,allLambdas,allLambdasOut);
-toc % 1357s -> 1034s 
+toc % 1357s -> 1034s =
 figure;imagesc(network);colorbar;colormap('jet');
 title('AGL output')
 

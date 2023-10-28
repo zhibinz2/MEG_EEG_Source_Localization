@@ -76,6 +76,8 @@ source_coor=corti_ave_source_coor{1,1,1};
 load('../../Virtual-Tractography/ForZhibin/processed_data/scale250_Connectome.mat');
 SC=logical(fc(source_labels,source_labels));
 figure;imagesc(SC);colorbar;colormap('jet')
+figure;imagesc(triu(SC,1));colorbar;colormap('jet')
+sum(triu(SC,1),"all")
 
 % GforFit =[double(SC),double(SC) ; double(SC), double(SC)]; % boolean
 % figure;imagesc(GforFit);colorbar;colormap('jet')
@@ -375,6 +377,21 @@ for freq=1:5
 end
 sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
 
+figure;clf;
+ses=1; subj=2;
+tr=11;
+cmin=-0.001;cmax=0.001;
+for freq=1:5
+    subplot(2,5,freq);
+    imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+    title(['option 1 freq ' num2str(freq)]);
+    clim([cmin cmax]);
+    subplot(2,5,5+freq);
+    imagesc(squeeze(X_op3_ses_1_2(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
+    title(['option 3 freq ' num2str(freq)]);
+    clim([cmin cmax]);
+end
+sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
 
 % compare the number of edges
 addpath(genpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util'));
@@ -397,9 +414,11 @@ for ses =1:2
         for tr =1:12
             for freq=1:5
                 newG = reduce2nNetwork(logical(squeeze(X_op1(ses,subj,tr,freq,:,:))));
+                X_reduced_op1(ses,subj,tr,freq,:,:)=newG;
                 NedgeIn_op1(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
                 NedgeOut_op1(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
                 newG = reduce2nNetwork(logical(squeeze(X_op3_ses_1_2(ses,subj,tr,freq,:,:))));
+                X_reduced_op1(ses,subj,tr,freq,:,:)=newG;
                 NedgeIn_op3(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
                 NedgeOut_op3(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
             end
@@ -407,7 +426,9 @@ for ses =1:2
     end
 end
 
+% fraction
 figure;
+clf;
 for ses=1:2
     for subj=1:2
         for tr=1:12
@@ -417,15 +438,16 @@ for ses=1:2
                 subplot(4,12,(ses+1)*12+tr)
             end
             hold on;
-            plot(1:5,squeeze(NedgeIn_op1(ses,subj,tr,:)),'g');
-            plot(1:5,squeeze(NedgeOut_op1(ses,subj,tr,:)),'r');
-            plot(1:5,squeeze(NedgeIn_op3(ses,subj,tr,:)),'b');
-            plot(1:5,squeeze(NedgeOut_op3(ses,subj,tr,:)),'m');
-            ylabel('n edges')
+            plot(1:5,squeeze(NedgeIn_op1(ses,subj,tr,:))/4985,'g');
+            plot(1:5,squeeze(NedgeOut_op1(ses,subj,tr,:))/(99681-4985),'r');
+            plot(1:5,squeeze(NedgeIn_op3(ses,subj,tr,:))/4985,'b');
+            plot(1:5,squeeze(NedgeOut_op3(ses,subj,tr,:))/(99681-4985),'m');
+            ylabel('n edges (prt)')
             xlabel('frequency band')
             title(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
             xticks([1:5])
             xticklabels(bandlabels)
+            ylim([0 0.8])
             hold off;
             if ses==1 && subj==1 && tr==1;
                 legend({'op1 in','op1 out','op3 in', 'op3 out'},'location','northwest');
@@ -433,6 +455,7 @@ for ses=1:2
         end
     end
 end
+
 
 
 % compare op1 (across subj) and op3 (across condition)
@@ -464,33 +487,49 @@ for condi=1:4
     end
 end
 
-
-
-
 % try X*dataCov and see if = identity
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('hilbert_dataCov_all.mat')
 load('X_op3_subj_1_dl_ses_1.mat')
-subj=1;dl_ses=1;freq=5;
+subj=1;dl_ses=1;freq=1;
 tr=1;
 ses=1+2*(dl_ses-1);
 dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
 X=squeeze(X_op3(ses,subj,tr,freq,:,:));
+% imagesc(X*dataCov);colorbar;
 imagesc(X.*dataCov);colorbar;
-imagesc(X);colorbar;
-imagesc(dataCov);colorbar;
-imagesc(eye(894));colorbar;
-vlim=0.1;
+% imagesc(X);colorbar;
+% imagesc(dataCov);colorbar;
+% imagesc(inv(dataCov));colorbar;
+% imagesc(eye(894));colorbar;
+% A=randi(10,10);
+% imagesc(A);colorbar;
+% imagesc(inv(A));colorbar;
+% imagesc(A*inv(A));colorbar;
+% imagesc(A*A');colorbar;
+vlim=1;
 clim([-1*vlim vlim]);
-
+title('X.*dataCov')
+subtitle(['Option 3: ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)'])
 % try real2Complex
 covMat_complex = real2Complex(X, 0);
 
+mean(diag(X.*dataCov))
+
+network = ggmFitHtf(dataCov+ eye(length(dataCov)) *min(allLambdas)  * max(max(triu(abs(dataCov),1))),GforFit_new);
+
+open inv
 
 
 %% test X * cov and ggmFitHtf
 cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/AGL
 open estBestPenalizationQUIC.m
+
+%%
+% /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util/genCov_CMVN_SC.m
+% /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util/normalizeCSD.m
+% /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util/real2Complex.m
+
 
 %% Other
 % two papers
