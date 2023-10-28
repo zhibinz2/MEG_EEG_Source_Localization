@@ -136,6 +136,7 @@ for ensam = 1:3
 end
 
 % penaltyselection for 1 subject
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
 penalizationIn_op3=nan(2,6,5);
 penalizationOut_op3=nan(2,6,5);
 minDev_op3=nan(2,6,5);
@@ -151,7 +152,8 @@ parfor subj=1%:2
     end
 end
 % 28000/3600= 8 h x 12 = 72 hours
-save('penaltyselection_op3_subj_2_dl_ses_1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('penaltyselection_op3_subj_1_dl_ses_1-4.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
 
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
