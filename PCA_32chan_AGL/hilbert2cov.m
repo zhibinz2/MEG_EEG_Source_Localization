@@ -120,7 +120,7 @@ end
 
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 cd ../../Cleaned_data/hilbert_datacov
-ave_hilcov_option3=nan(3,2,6,5,894,894); % 3 ensamble x 2 subjects x 6 double-sessions x 5 frequency x 894 x 894
+ave_hilcov_option3=nan(3,2,6,5,896,896); % 3 ensamble x 2 subjects x 6 double-sessions x 5 frequency x 894 x 894
 for ensam = 1:3
     for subj =1:2
         for dl_ses=1:6
@@ -139,8 +139,8 @@ end
 penalizationIn_op3=nan(2,6,5);
 penalizationOut_op3=nan(2,6,5);
 minDev_op3=nan(2,6,5);
-parfor subj=2%:2
-    for dl_ses=1%:6
+parfor subj=1%:2
+    for dl_ses=1:4%:6
         for freq=1:5
             tic
             dataCovs_op=squeeze(ave_hilcov_option3(:,subj,dl_ses,freq,:,:));
