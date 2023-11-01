@@ -1,0 +1,61 @@
+open /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util/normalizeCSD.m
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('Complex_X_op3_all.mat');
+
+ses=1;
+subj=2;
+tr=11;
+freq=1;
+cov_c=squeeze(Complex_X_op3_all(ses,subj,tr,freq,:,:));
+coh=normalizeCSD(cov_c);
+imagesc(coh);colorbar;
+vlim=0.001;
+clim([-1*vlim vlim]);
+title('coh')
+subtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
+
+% examine the number edges
+NedgeIn_coh=nan(12,2,12,5);
+NedgeOut_coh=nan(12,2,12,5);
+coh_all=nan(12,2,12,5,448,448);
+tic
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                cov_c=squeeze(Complex_X_op3_all(ses,subj,tr,freq,:,:));
+                newG=normalizeCSD(cov_c);
+                coh_all(ses,subj,tr,freq,:,:)=newG;
+                NedgeIn_coh(ses,subj,tr,freq) = sum(sum(logical(newG).*triu(SC,1)));
+                NedgeOut_coh(ses,subj,tr,freq) =  sum(sum(logical(newG).*triu(~SC,1)));
+            end
+        end
+    end
+end
+toc % 12S
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('coh_all.mat','coh_all','-v7.3');
+
+
+%% sort through condtions
+% boolean matrix average
+NedgeIn_coh4=cell(4,5);
+NedgeOut_coh4=cell(4,5);
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                if 
+            end
+        end
+    end
+end
+
+
+
+                
+% correlation with granger
+
+
+
+

@@ -120,7 +120,7 @@ end
 
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
 cd ../../Cleaned_data/hilbert_datacov
-ave_hilcov_option3=nan(3,2,6,5,894,894); % 3 ensamble x 2 subjects x 6 double-sessions x 5 frequency x 894 x 894
+ave_hilcov_option3=nan(3,2,6,5,896,896); % 3 ensamble x 2 subjects x 6 double-sessions x 5 frequency x 894 x 894
 for ensam = 1:3
     for subj =1:2
         for dl_ses=1:6
@@ -136,6 +136,9 @@ for ensam = 1:3
 end
 
 % penaltyselection for 1 subject
+addpath(genpath('/../../AdaptiveGraphicalLassoforParCoh/Simulations/util'))
+addpath(genpath('../../AdaptiveGraphicalLassoforParCoh/AGL'))
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
 penalizationIn_op3=nan(2,6,5);
 penalizationOut_op3=nan(2,6,5);
 minDev_op3=nan(2,6,5);
@@ -151,13 +154,34 @@ parfor subj=1%:2
     end
 end
 % 28000/3600= 8 h x 12 = 72 hours
-save('penaltyselection_op3_subj_2_dl_ses_1.mat','penalizationOut_op1','penalizationIn_op1','minDev_op1');
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('penaltyselection_op3_subj_1_dl_ses_1-4.mat','penalizationOut_op3','penalizationIn_op3','minDev_op3');
+
+% combine hnlb, hnba, hnl1
+penalizationIn_op3_all=nan(2,6,5);
+penalizationOut_op3_all=nan(2,6,5);
+minDev_op3_all=nan(2,6,5);
+load('penaltyselection_op3_subj_1_dl_ses_1-4.mat')
+penalizationIn_op3_all(1,1:4,:)=penalizationIn_op3(1,1:4,:);
+penalizationOut_op3_all(1,1:4,:)=penalizationOut_op3(1,1:4,:);
+minDev_op3_all(1,1:4,:)=minDev_op3(1,1:4,:);
+load('penaltyselection_op3_subj_1_dl_ses_5-6.mat')
+penalizationIn_op3_all(1,5:6,:)=penalizationIn_op3(1,5:6,:);
+penalizationOut_op3_all(1,5:6,:)=penalizationOut_op3(1,5:6,:);
+minDev_op3_all(1,5:6,:)=minDev_op3(1,5:6,:);
+load('penaltyselection_op3_subj_2_dl_ses_1-6.mat')
+penalizationIn_op3_all(2,1:6,:)=penalizationIn_op3(2,1:6,:);
+penalizationOut_op3_all(2,1:6,:)=penalizationOut_op3(2,1:6,:);
+minDev_op3_all(2,1:6,:)=minDev_op3(2,1:6,:);
+save('penaltyselection_op3_all.mat','penalizationOut_op3_all','penalizationIn_op3_all','minDev_op3_all');
+% subj=2;ses_dl=1;freq=1; 
 
 % fitprecision
 % hilbert_dataCov_all=nan(12,2,12,5,894,894);
-X_op3=nan(12,2,12,5,894,894);
-for subj=2%:2
-    for dl_ses=1%:6
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
+X_op3=nan(12,2,12,5,896,896);
+for subj=1%:2
+    for dl_ses=1:4%:6
         for freq=1:5
             penalizationIn=penalizationIn_op3(subj,dl_ses,freq);
             penalizationOut=penalizationOut_op3(subj,dl_ses,freq);
@@ -174,154 +198,103 @@ for subj=2%:2
         end
     end
 end
-save('X_op3_subj_2_dl_ses_1.mat','X_op3','-v7.3');
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('X_op3_subj_1_dl_ses_1-4.mat','X_op3','-v7.3');
 % save('X_op3_subj_1_dl_ses_1.mat','X_op3');
 % teest
 % tic;xxx=fitprecision(SC,penalizationIn,penalizationOut,min_LamdaIn,dataCov);toc; % 102 s
 % estimated for all 100*2*5*6*2/3600 = 3 hours
 
-%% option 4
-% By comparison, if you just take 3 trials and 1 subject in 1 condition, 
-% and do cross-validation what is the penalty inside and outside.
-% penaltyselection for 1 subject
-
-% In 1 subject first
-% hilbert_dataCov_all=nan(12,2,12,5,894,894);
-cd ../../Cleaned_data/hilbert_datacov
-ave_hilcov_option4=nan(5,3,894,894); % 5 frequency x 3 ensamble x 894 x 894
-ses=1; subj=1; tr=1:3;
-for freq=1:5
-    ave_hilcov_option4(freq,:,:,:)=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
-end
-
-penalizationIn_op4=nan(5,1);
-penalizationOut_op4=nan(5,1);
-minDev_op4=nan(5,1);
-for freq=1:5
-    tic
-    dataCovs_op=squeeze(ave_hilcov_option4(freq,:,:,:));
-    [penalizationIn_op4(freq),penalizationOut_op4(freq),minDev_op4(freq)]=...
-    penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
-    toc
-end
-save('penaltyselection_op4.mat','penalizationIn_op4','penalizationOut_op4','minDev_op4')
-
-%% Compare subj=1, ses=1:2 of option 1 and 3
-cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
-
-condi=1;freq=5;
-penalizationIn_op1(condi,freq)
-penalizationOut_op1(condi,freq)
-minDev_op1(condi,freq)
-
-subj=1;dl_ses=1;freq=5;
-penalizationIn_op3(subj,dl_ses,:)
-penalizationOut_op3(subj,dl_ses,:)
-minDev_op3(subj,dl_ses,:)
-
-
-load('penaltyselection_op1.mat')
-load('penaltyselection_op3.mat')
-
-load('X_op1_ses_1-2.mat')
-load('X_op3_subj_1_dl_ses_1.mat')
-
-ses=1; subj=1;
-freq=3;
-tr=11;
-% compare the precision output from op1 and op3
-cmin=-0.001;cmax=0.001;
-figure;
-clf;
-subplot(131);
-imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-title(['option 1 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
-clim([cmin cmax])
-
-subplot(132);
-imagesc(squeeze(X_op3(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-title(['option 3 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
-clim([cmin cmax])
-
-subplot(133);
-imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:))-squeeze(X_op3(ses,subj,tr,freq,:,:))); colormap('jet');colorbar;
-title(['option 1-3 ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
-clim([cmin cmax])
-
-% sum(diag(logical(squeeze(X_op3(ses,subj,tr,freq,:,:)))))
-% (sum(logical(squeeze(X_op1(ses,subj,tr,freq,:,:))),'all')-894)/2
-% sum(triu(logical(squeeze(X_op1(ses,subj,tr,freq,:,:)))),'all')-894
-
-% compare 5 frequency in op1 and op3
-figure;clf;
-ses=1; subj=1;
-tr=11;
-cmin=-0.001;cmax=0.001;
-for freq=1:5
-    subplot(2,5,freq);
-    imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-    title(['option 1 freq ' num2str(freq)]);
-    clim([cmin cmax]);
-    subplot(2,5,5+freq);
-    imagesc(squeeze(X_op3(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-    title(['option 3 freq ' num2str(freq)]);
-    clim([cmin cmax]);
-end
-sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
-
-figure;clf;
-ses=1; subj=2;
-tr=11;
-cmin=-0.001;cmax=0.001;
-for freq=1:5
-    subplot(2,5,freq);
-    imagesc(squeeze(X_op1(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-    title(['option 1 freq ' num2str(freq)]);
-    clim([cmin cmax]);
-    subplot(2,5,5+freq);
-    imagesc(squeeze(X_op3_ses_1_2(ses,subj,tr,freq,:,:)));colormap('jet');colorbar;
-    title(['option 3 freq ' num2str(freq)]);
-    clim([cmin cmax]);
-end
-sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
-
-% compare the number of edges
-addpath(genpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util'));
-cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
-load('X_op1_ses_1-2.mat')
-% load('X_op3_subj_1_dl_ses_1.mat')
-% X_op3_ses_1_2=nan(12,2,12,5,894,894);
-% X_op3_ses_1_2(1:2,1,:,:,:,:)=X_op3(1:2,1,:,:,:,:);
-% load('X_op3_subj_2_dl_ses_1.mat');
-% X_op3_ses_1_2(1:2,2,:,:,:,:)=X_op3(1:2,2,:,:,:,:);
-% save('X_op3_ses_1_2.mat','X_op3_ses_1_2','-v7.3');
-load('X_op3_ses_1_2.mat')
-
-NedgeIn_op1=nan(12,2,12,5);
-NedgeOut_op1=nan(12,2,12,5);
-NedgeIn_op3=nan(12,2,12,5);
-NedgeOut_op3=nan(12,2,12,5);
-for ses =1:2
-    for subj = 1:2
-        for tr =1:12
-            for freq=1:5
-                newG = reduce2nNetwork(logical(squeeze(X_op1(ses,subj,tr,freq,:,:))));
-                X_reduced_op1(ses,subj,tr,freq,:,:)=newG;
-                NedgeIn_op1(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
-                NedgeOut_op1(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
-                newG = reduce2nNetwork(logical(squeeze(X_op3_ses_1_2(ses,subj,tr,freq,:,:))));
-                X_reduced_op1(ses,subj,tr,freq,:,:)=newG;
-                NedgeIn_op3(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
-                NedgeOut_op3(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
+% % combine hnlb, hnba, hnl1
+X_op3_all=nan(12,2,12,5,896,896);
+load('X_op3_subj_1_dl_ses_1-4.mat')
+for subj=1%:2
+    for dl_ses=1:4%:6
+        for freq=1:5
+            for tr=1:12
+                ses=1+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
+                ses=2+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
             end
         end
     end
 end
+load('X_op3_subj_1_dl_ses_5-6.mat')
+for subj=1%:2
+    for dl_ses=5:6%:6
+        for freq=1:5
+            for tr=1:12
+                ses=1+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
+                ses=2+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
+            end
+        end
+    end
+end
+load('X_op3_subj_2_dl_ses_1-6.mat')
+for subj=2%:2
+    for dl_ses=1:6%:6
+        for freq=1:5
+            for tr=1:12
+                ses=1+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
+                ses=2+2*(dl_ses-1);
+                X_op3_all(ses,subj,tr,freq,:,:)=X_op3(ses,subj,tr,freq,:,:);
+            end
+        end
+    end
+end
+save('X_op3_all.mat','X_op3_all','-v7.3');
 
-% fraction
+%% Examing number of edges
+addpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util')
+NedgeIn_op3=nan(12,2,12,5);
+NedgeOut_op3=nan(12,2,12,5);
+Reduced_X_op3_all=nan(12,2,12,5,448,448);
+tic
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                X=squeeze(X_op3_all(ses,subj,tr,freq,:,:));
+                newG = reduce2nNetwork(logical(X));
+                NedgeIn_op3(ses,subj,tr,freq) = sum(sum(newG.*triu(SC,1)));
+                NedgeOut_op3(ses,subj,tr,freq) =  sum(sum(newG.*triu(~SC,1)));
+                Reduced_X_op3_all(ses,subj,tr,freq,:,:)=newG;
+                Complex_X_op3_all(ses,subj,tr,freq,:,:)=r2c(X, 0);
+            end
+        end
+    end
+end
+toc
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('Reduced_X_op3_all.mat','Reduced_X_op3_all','-v7.3');
+
+
+Complex_X_op3_all=nan(12,2,12,5,448,448);
+tic
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                X=squeeze(X_op3_all(ses,subj,tr,freq,:,:));
+                Complex_X_op3_all(ses,subj,tr,freq,:,:)=r2c(X, 0);
+            end
+        end
+    end
+end
+toc
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+save('Complex_X_op3_all.mat','Complex_X_op3_all','-v7.3');
+
+
+% examine fraction
 figure;
 clf;
-for ses=1:2
+for ses_r=11:12
+    ses=ses_r-10;
     for subj=1:2
         for tr=1:12
             if subj==1;
@@ -330,13 +303,11 @@ for ses=1:2
                 subplot(4,12,(ses+1)*12+tr)
             end
             hold on;
-            plot(1:5,squeeze(NedgeIn_op1(ses,subj,tr,:))/4985,'g');
-            plot(1:5,squeeze(NedgeOut_op1(ses,subj,tr,:))/(99681-4985),'r');
-            plot(1:5,squeeze(NedgeIn_op3(ses,subj,tr,:))/4985,'b');
-            plot(1:5,squeeze(NedgeOut_op3(ses,subj,tr,:))/(99681-4985),'m');
+            plot(1:5,squeeze(NedgeIn_op3(ses_r,subj,tr,:))/4985,'b');
+            plot(1:5,squeeze(NedgeOut_op3(ses_r,subj,tr,:))/(99681-4985),'m');
             ylabel('n edges (prt)')
             xlabel('frequency band')
-            title(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
+            title(['ses ' num2str(ses_r) ' subj ' num2str(subj) ' trial ' num2str(tr)]);
             xticks([1:5])
             xticklabels(bandlabels)
             ylim([0 0.8])
@@ -349,45 +320,16 @@ for ses=1:2
 end
 
 
-
-% compare op1 (across subj) and op3 (across condition)
-std_subj_NedgeIn_op1=nan(2,5);
-std_subj_NedgeOut_op1=nan(2,5);
-mean_subj_NedgeIn_op1=nan(2,5);
-mean_subj_NedgeOut_op1=nan(2,5);
-for subj=1:2
-    for freq=1:5
-        % std(reshape(NedgeIn_op1(1:2,subj,:,freq),[],1))
-        std_subj_NedgeIn_op1(subj,freq)=std(NedgeIn_op1(1:2,subj,:,freq),0,'all');
-        std_subj_NedgeOut_op1(subj,freq)=std(NedgeOut_op1(1:2,subj,:,freq),0,'all');
-        mean_subj_NedgeIn_op1(subj,freq)=mean(NedgeIn_op1(1:2,subj,:,freq),'all');
-        mean_subj_NedgeOut_op1(subj,freq)=mean(NedgeOut_op1(1:2,subj,:,freq),'all');
-    end
-end
-
-
-std_condi_NedgeIn_op3=nan(4,5);
-std_condi_NedgeOut_op3=nan(4,5);
-mean_condi_NedgeIn_op3=nan(4,5);
-mean_condi_NedgeOut_op3=nan(4,5);
-for condi=1:4
-    for freq=1:5
-        std_condi_NedgeIn_op3(condi,freq)=std(NedgeIn_op3(1:2,:,[1:3]+3*(condi-1),freq),0,'all');
-        std_condi_NedgeOut_op3(condi,freq)=std(NedgeOut_op3(1:2,:,[1:3]+3*(condi-1),freq),0,'all');
-        mean_condi_NedgeIn_op3(condi,freq)=mean(NedgeIn_op3(1:2,:,[1:3]+3*(condi-1),freq),'all');
-        mean_condi_NedgeOut_op3(condi,freq)=mean(NedgeOut_op3(1:2,:,[1:3]+3*(condi-1),freq),'all');
-    end
-end
-
+%% Examing subj=2;ses_dl=1;freq=1; (test)
 % try X*dataCov and see if = identity
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('hilbert_dataCov_all.mat')
-load('X_op3_subj_1_dl_ses_1.mat')
-subj=1;dl_ses=1;freq=1;
+load('X_op3_all.mat')
+subj=2;ses_dl=1;freq=1; 
 tr=1;
-ses=1+2*(dl_ses-1);
+ses=1+2*(ses_dl-1);
 dataCov=squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:));
-X=squeeze(X_op3(ses,subj,tr,freq,:,:));
+X=squeeze(X_op3_all(ses,subj,tr,freq,:,:));
 % imagesc(X*dataCov);colorbar;
 imagesc(X.*dataCov);colorbar;
 % imagesc(X);colorbar;
@@ -403,13 +345,18 @@ vlim=1;
 clim([-1*vlim vlim]);
 title('X.*dataCov')
 subtitle(['Option 3: ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr)'])
+
+
 % try real2Complex
-covMat_complex = real2Complex(X, 0);
+covMat_complex = real2Complex(X, 0); % no dimension reduction
+
 
 mean(diag(X.*dataCov))
 
+newG = reduce2nNetwork(logical(X));
+GforFit_new = [newG, newG.*double(~eye(length(newG))); newG.*double(~eye(length(newG))), newG];
 network = ggmFitHtf(dataCov+ eye(length(dataCov)) *min(allLambdas)  * max(max(triu(abs(dataCov),1))),GforFit_new);
-
+% imagesc(network*dataCov);colorbar;
 open inv
 
 
