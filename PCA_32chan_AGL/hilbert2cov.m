@@ -108,6 +108,49 @@ end
 % cd ../../Cleaned_data/hilbert_datacov/
 % save('hilbert_dataCov_all.mat','hilbert_dataCov_all','-v7.3');
 
+% convert to complex covariance
+Complex_dataCov_all=nan(12,2,12,5,448,448);
+for ses=1:numSes
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                Complex_dataCov_all(ses,subj,tr,freq,:,:)=r2c(squeeze(hilbert_dataCov_all(ses,subj,tr,freq,:,:)));
+            end
+        end
+    end
+end
+% cd ../../Cleaned_data/hilbert_datacov/
+% save('Complex_dataCov_all.mat','Complex_dataCov_all','-v7.3');
+
+% normalize to real coherence
+coh_all=nan(12,2,12,5,448,448);
+for ses=1:numSes
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                coh_all(ses,subj,tr,freq,:,:)=normalizeCSD(squeeze(Complex_dataCov_all(ses,subj,tr,freq,:,:)));
+            end
+        end
+    end
+end
+% save('coh_all.mat','coh_all','-v7.3');
+
+ses=12;
+subj=1;
+tr=2;
+freq=2;
+subplot(121)
+coh=squeeze(coh_all(ses,subj,tr,freq,:,:));
+imagesc(coh);colorbar;colormap('jet');
+clim([0 1]);
+title('coh')
+subplot(122)
+Pcoh=squeeze(Pcoh_boolean(ses,subj,tr,freq,:,:));
+imagesc(Pcoh);colorbar;colormap('jet');
+vlim=0.005;
+clim([0 vlim]);
+title('Pcoh boolean')
+sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
 
 %% option 3 By subject
 % We should also save the deviance values for the final fit, because they tell us how good a model it is.
@@ -249,7 +292,8 @@ end
 save('X_op3_all.mat','X_op3_all','-v7.3');
 
 %% Examing number of edges
-addpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util')
+% using Ani's reduce2nNetwork
+addpath('/home/zhibinz2/Documents/GitHub/AdaptiveGraphircalLassoforParCoh/Simulations/util')
 NedgeIn_op3=nan(12,2,12,5);
 NedgeOut_op3=nan(12,2,12,5);
 Reduced_X_op3_all=nan(12,2,12,5,448,448);
@@ -271,7 +315,7 @@ toc % 29s
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 save('Reduced_X_op3_all.mat','Reduced_X_op3_all','-v7.3');
 
-
+% using my r2c 
 Complex_X_op3_all=nan(12,2,12,5,448,448);
 tic
 for ses =1:12
