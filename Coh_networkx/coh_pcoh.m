@@ -1,5 +1,6 @@
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
-load('coh_all.mat'); % coherence 12x2x12x5x448x448 (session x subject x trial x frequency x source x source)
+% coherence 12x2x12x5x448x448 (session x subject x trial x frequency x source x source)
+load('coh_all.mat'); % values from 0-1
 load('Pcoh_boolean.mat'); % partial coherence 12x2x12x5x448x448 (session x subject x trial x frequency x source x source
 % session 1-12: in time sequence [20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;2022100402;20221005]
 % odd number sessions are synch; even number sessions are synco
@@ -8,11 +9,12 @@ load('Pcoh_boolean.mat'); % partial coherence 12x2x12x5x448x448 (session x subje
 % frequency 1-5: {'Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2'}
 % source 1-448: all cortical ROIs from Right to the left hemisphere
 
-%
+% select a trial and frequency to examine coherence and partial coherence
 ses=12;
 subj=1;
 tr=2;
 freq=2;
+% plot
 subplot(121)
 coh=squeeze(coh_all(ses,subj,tr,freq,:,:));
 imagesc(coh);colorbar;colormap('jet');
@@ -21,16 +23,35 @@ title('coh')
 subplot(122)
 Pcoh=squeeze(Pcoh_boolean(ses,subj,tr,freq,:,:));
 imagesc(Pcoh);colorbar;colormap('jet');
-vlim=0.005;
-clim([0 vlim]);
+clim([0 1]);
 title('Pcoh boolean')
 sgtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' freq ' num2str(freq)]);
 
 
-% boolean matrix average
-NedgeIn_coh4=cell(2,4,5);
+%% Examine edges from Partial coherence in different conditions
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('SC.mat')
+n_in=sum(triu(SC,1),'all'); % total number of edges inside SC
+n_out=sum(triu(~SC,1),'all'); % total number of edges outside SC
+
+% compute number of edges 
+NedgeIn_coh=nan(12,2,12,5); % inside SC
+NedgeOut_coh=nan(12,2,12,5); % outside SC
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                G=squeeze(Pcoh_boolean(ses,subj,tr,freq,:,:));
+                NedgeIn_coh(ses,subj,tr,freq) = sum(G.*triu(SC,1),'all');
+                NedgeOut_coh(ses,subj,tr,freq) =  sum(G.*triu(~SC,1),'all');
+            end
+        end
+    end
+end
+
+% organzied into 2 syn type and 4 conditons
+NedgeIn_coh4=cell(2,4,5); 
 NedgeOut_coh4=cell(2,4,5);
-tic
 for ses =1:12
     for subj = 1:2
         for tr =1:12
@@ -67,13 +88,8 @@ for ses =1:12
         end
     end
 end
-toc
 
-
-
-%%
-bandlabels = {'Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2'};
-
+% compute the mean and standard error
 NedgeIn_coh4mean=nan(2,4,5);
 NedgeOut_coh4mean=nan(2,4,5);
 NedgeIn_coh4ste=nan(2,4,5);
@@ -89,32 +105,31 @@ for syn=1:2
     end
 end
 
-n_in=sum(triu(SC,1),'all');
-n_out=sum(triu(~SC,1),'all');
-
-syn2names={'syncH','syncO'};
-syn=1;
-syn=2;
-
-figure;
-model_series=(squeeze(NedgeIn_coh4mean(syn,:,:)))'/n_in;
-model_error=(squeeze(NedgeIn_coh4ste(syn,:,:)))'/n_in;
-b=bar(model_series,'grouped');
-% Calculate the number of groups and number of bars in each group
-[ngroups,nbars] = size(model_series);
-% Get the x coordinate of the bars
-x = nan(nbars, ngroups);
-for i = 1:nbars
-    b(i).FaceColor=condicolors(i,:);
-    x(i,:) = b(i).XEndPoints;
+%% plotting
+% load labels and colors for plots
+run plotting_scheme.m
+figure
+for syn =1:2
+    subplot(1,2,syn);
+    model_series=(squeeze(NedgeIn_coh4mean(syn,:,:)))'/n_in;
+    model_error=(squeeze(NedgeIn_coh4ste(syn,:,:)))'/n_in;
+    b=bar(model_series,'grouped');
+    % Calculate the number of groups and number of bars in each group
+    [ngroups,nbars] = size(model_series);
+    % Get the x coordinate of the bars
+    x = nan(nbars, ngroups);
+    for i = 1:nbars
+        b(i).FaceColor=condicolors(i,:);
+        x(i,:) = b(i).XEndPoints;
+    end
+    % Plot the errorbars 
+    hold on;
+    errorbar(x', model_series, model_error,'k','linestyle','none','LineWidth',2);
+    ylabel(['prt of edges'])
+    xticks([1:5])
+    xticklabels(bandlabels)
+    
+    legend(condi4names)
+    ylim([0.05 0.3])
+    title(['inside SC: ' syn2names{syn}],'color',syn2colors(syn,:));
 end
-% Plot the errorbars 
-hold on;
-errorbar(x', model_series, model_error,'k','linestyle','none','LineWidth',2);
-ylabel(['prt of edges'])
-xticks([1:5])
-xticklabels(bandlabels)
-condi4names={'Uncouple','Leading','Following','Mutual'};
-legend(condi4names)
-ylim([0.05 0.3])
-title(['inside SC: ' syn2names{syn}]);

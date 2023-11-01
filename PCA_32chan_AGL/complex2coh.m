@@ -114,7 +114,7 @@ for ses =1:12
                 elseif (ismember(tr,[4:6]) & subj==2) | (ismember(tr,[7:9]) & subj==1); % following
                     NedgeIn_coh4{3,freq}=[NedgeIn_coh4{3,freq} NedgeIn_coh(ses,subj,tr,freq)];
                     NedgeOut_coh4{3,freq}=[NedgeOut_coh4{3,freq} NedgeOut_coh(ses,subj,tr,freq)];
-                else ismember(tr,[10:12]);
+                else ismember(tr,[10:12]); % mutual
                     NedgeIn_coh4{4,freq}=[NedgeIn_coh4{4,freq} NedgeIn_coh(ses,subj,tr,freq)];
                     NedgeOut_coh4{4,freq}=[NedgeOut_coh4{4,freq} NedgeOut_coh(ses,subj,tr,freq)];
                 end
