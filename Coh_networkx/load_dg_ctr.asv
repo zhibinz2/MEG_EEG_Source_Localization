@@ -238,12 +238,56 @@ dire3colors=[darkgreen;brown;megenta];
 for freq=1:5
     subplot(5,1,freq)
     hold on
-    plot(1:448,squeeze(corr_dg_ctr_matched(1,freq,:)),'.','color',dire3colors(1,:));
-    plot(1:448,squeeze(corr_dg_ctr_matched(2,freq,:)),'.','color',dire3colors(2,:));
-    plot(1:448,squeeze(corr_dg_ctr_matched(3,freq,:)),'.','color',dire3colors(3,:));
+    plot(1:448,squeeze(corr_dg_ctr_matched(1,freq,:)),'.','color',dire3colors(1,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(2,freq,:)),'.','color',dire3colors(2,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(3,freq,:)),'.','color',dire3colors(3,:),'MarkerSize',12);
     xlabel('sources');ylabel('correlation');
     ylim([-0.4 1]);
     title(bandlabels{freq});
     hold off;
+    if freq ==1
+        legend(direction3names)
+    end
+    grid on
 end
-sgtitle('correlation of degreee centrality between subject pair')
+sgtitle({'Correlation of degreee centrality between subject pair', ...
+    'show only sources with correlation of Independent+0.2<Unidirectional<Bidirectional-0.2 && abs(Independent)<0.4 && Bidirectional>0.6'});
+set(gcf,'color','w'); 
+
+% identify those source labels
+corr_dg_ctr_matched_labels=cell(5,1);
+for freq = 1:5
+    A=squeeze(corr_dg_ctr_matched(3,freq,:));
+    A(isnan(A))=0;
+    corr_dg_ctr_matched_labels{freq}=find(A);
+end
+
+figure;
+clf
+freq_select=[2 4 5];
+for i=1:3
+    subplot(1,3,i)
+    hold on;
+
+    Brainmesh=trimesh(tr,'EdgeColor',[0.01 0.01 0.01],'EdgeAlpha',0.01);
+    colormap(gca,'gray');
+    alpha(Brainmesh, 0.1);
+
+    inds=corr_dg_ctr_matched_labels{freq_select(i)};
+    roiNames_250{inds};
+    scatter3(x,y,z,'g','filled'); hold on;
+    scatter3(x(inds),y(inds),z(inds),'r','filled');
+    % text label
+    for j=1:length(inds)
+        text(x(inds(j)),y(inds(j)),z(inds(j)),roiNames_250{inds(j)},'F');
+    end
+    title(bandlabels{freq_select(i)},'FontSize',20)
+    view(0,90); %top view
+    grid off
+    axis off
+    hold off
+end
+set(gcf,'color','w'); 
+
+
+%% Granger
