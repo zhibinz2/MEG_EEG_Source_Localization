@@ -11,12 +11,10 @@ for ses =1:12
                 elseif ismember(tr,[1 2 3]) && ismember(ses,[2:2:12]); % uncouple synco
                     dg_ctr_2_4{2,1,freq} = cat(2,dg_ctr_2_4{2,1,freq},squeeze(dg_ctr_all(ses,subj,tr,freq,:)));
                     
-
                 elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[1:2:11]); % leading synch
                     dg_ctr_2_4{1,2,freq} = cat(2,dg_ctr_2_4{1,2,freq},squeeze(dg_ctr_all(ses,subj,tr,freq,:)));
                 elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[2:2:12]); % leading synco
                     dg_ctr_2_4{2,2,freq} = cat(2,dg_ctr_2_4{2,2,freq},squeeze(dg_ctr_all(ses,subj,tr,freq,:)));
-                    
 
                 elseif ((ismember(tr,[4:6]) && subj==2) || (ismember(tr,[7:9]) && subj==1)) && ismember(ses,[1:2:11]); % following synch
                     dg_ctr_2_4{1,3,freq} = cat(2,dg_ctr_2_4{1,3,freq},squeeze(dg_ctr_all(ses,subj,tr,freq,:)));
@@ -274,12 +272,12 @@ for i=1:3
     alpha(Brainmesh, 0.1);
 
     inds=corr_dg_ctr_matched_labels{freq_select(i)};
-    roiNames_250{inds};
+    roiNames_250{corti_ave_source_labl(inds)};
     scatter3(x,y,z,'g','filled'); hold on;
     scatter3(x(inds),y(inds),z(inds),'r','filled');
     % text label
     for j=1:length(inds)
-        text(x(inds(j)),y(inds(j)),z(inds(j)),roiNames_250{inds(j)},'FontSize',15);
+        text(x(inds(j)),y(inds(j)),z(inds(j)),roiNames_250{corti_ave_source_labl(inds(j))},'FontSize',15);
     end
     title(bandlabels{freq_select(i)},'FontSize',20)
     view(0,90); %top view

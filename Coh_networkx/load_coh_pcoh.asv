@@ -87,20 +87,11 @@ for syn = 1:2
 end
 
 % examine the mean in a plot
-A=m_coh;
-A=m_pcoh;
 for freq=1:5
     figure;
-    sgtitle(bandlabels{freq})
     for syn =1:2
         for condi=1:4
-            subplot(2,4,2*(syn-1)+condi)
-            imagesc(squeeze(A(syn,condi,freq,:,:)));colorbar;
-            colormap('jet');
-            title([syn2names{syn} ' ' condi4names{condi}]);
-        end
-    end
-end
+            subplot(2,4,2*(syn-1))
 
 
 
