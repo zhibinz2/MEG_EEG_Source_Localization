@@ -35,12 +35,14 @@ load('SC.mat');
 % aggreate coh and pcoh inside SC for 2x4 condi
 sc_coh=cell(2,4,5); % 448x448x36 trial within each cell
 sc_pcoh=cell(2,4,5); % 448x448x36 trial within each cell
+tic
 for ses =1:12
     for subj = 1:2
         for tr =1:12
             for freq=1:5
                 coh=squeeze(coh_all(ses,subj,tr,freq,:,:)).*SC;
                 pcoh=squeeze(Pcoh_boolean(ses,subj,tr,freq,:,:)).*SC;
+
                 if ismember(tr,[1 2 3]) && ismember(ses,[1:2:11]); % uncouple synch
                     sc_coh{1,1,freq}=cat(3,sc_coh{1,1,freq},coh);
                     sc_pcoh{1,1,freq}=cat(3,sc_pcoh{1,1,freq},pcoh);
@@ -73,6 +75,7 @@ for ses =1:12
         end
     end
 end
+toc % 44s
 
 % mean coh and pcoh
 m_coh=zeros(2,4,5,448,448);
@@ -87,15 +90,44 @@ for syn = 1:2
 end
 
 % examine the mean in a plot
+% select coh or pcoh to plot
+A=m_coh;
+A=m_pcoh;
+% plot
 for freq=1:5
     figure;
+    sgtitle(bandlabels{freq})
     for syn =1:2
         for condi=1:4
-            subplot(2,4,2*(syn-1))
+            subplot(2,4,4*(syn-1)+condi)
+            imagesc(squeeze(A(syn,condi,freq,:,:)));colorbar;
+            colormap('jet');
+            title([syn2names{syn} ' ' condi4names{condi}]);
+        end
+    end
+end
 
-
-
-
+% The above look all very similar
+% need zscoreing the 2x4 conditions
+zr_coh=nan(8,5,448,448);% reorganzied into 8 x 5 x 488 x 488 then zscore along the first dimention
+zr_pcoh=nan(8,5,448,448);
+for freq =1:5
+    i=1;
+    for syn=1:2
+        for condi=1:4
+            zr_coh(i,freq,:,:)=squeeze(m_coh(syn,condi,freq,:,:));
+            zr_pcoh(i,freq,:,:)=squeeze(m_pcoh(syn,condi,freq,:,:));
+        end
+    end
+    i=i+1;
+end
+% convert to z-score
+z_coh=nan(8,5,448,448);% reorganzied into 8 x 5 x 488 x 488 then zscore along the first dimention
+z_pcoh=nan(8,5,448,448);
+for freq =1:5
+    zr_coh(:,freq,:,:)
+    zr_pcoh(:,freq,:,:)
+end
 
 %% Examine number of edges from Partial coherence in different conditions
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
