@@ -36,3 +36,9 @@ condicolors=[darkgreen;red;blue;megenta;purple;purple];
 dire3colors=[darkgreen;brown;megenta];
 syn2colors=[darkgreen;pink];
 HNLcolors = [darkgreen; deepyellow; pink];
+
+%%
+% colormap
+addpath /home/zhibinz2/Documents/GitHub/matlab-archive/hnlcode/common/gen_code/color
+hnc = hotncold(100);
+hottermap=hotter(100);

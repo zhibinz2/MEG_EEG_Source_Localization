@@ -40,7 +40,7 @@ for ses =1:12
     for subj = 1:2
         for tr =1:12
             for freq=1:5
-                coh=squeeze(coh_all(ses,subj,tr,freq,:,:)).*SC;
+                coh=squeeze(coh_all(ses,subj,tr,freq,:,:)).*SC; % investigate only within SC
                 pcoh=squeeze(Pcoh_boolean(ses,subj,tr,freq,:,:)).*SC;
 
                 if ismember(tr,[1 2 3]) && ismember(ses,[1:2:11]); % uncouple synch
@@ -96,7 +96,7 @@ A=m_pcoh;
 % plot
 for freq=1:5
     figure;
-    sgtitle(bandlabels{freq})
+    sgtitle([bandlabels{freq} ' pcoh'])
     for syn =1:2
         for condi=1:4
             subplot(2,4,4*(syn-1)+condi)
@@ -117,9 +117,9 @@ for freq =1:5
         for condi=1:4
             zr_coh(i,freq,:,:)=squeeze(m_coh(syn,condi,freq,:,:));
             zr_pcoh(i,freq,:,:)=squeeze(m_pcoh(syn,condi,freq,:,:));
+            i=i+1;
         end
-    end
-    i=i+1;
+    end    
 end
 % convert to z-score
 z_coh=nan(8,5,448,448);% reorganzied into 8 x 5 x 488 x 488 then zscore along the first dimention
@@ -132,32 +132,33 @@ end
 A=z_coh;
 A=z_pcoh;
 for freq=1:5
-    figure;
-    sgtitle(bandlabels{freq})
+    figure('units','normalized','outerposition',[0 0 1 1]);
+    sgtitle([bandlabels{freq} '   zscore among the 8 condition.  pcoh'])
     i = 1;
     for syn =1:2
         for condi=1:4
             subplot(2,4,i)
             imagesc(squeeze(A(i,freq,:,:)));colorbar;
-            colormap('jet');
+            colormap('hotncold');
             title([syn2names{syn} ' ' condi4names{condi}]);
+            clim([-2.5 2.5])
             i=i+1;
         end
     end
 end
-% the above look all very similar
+
 % try difference to the mean
 d_coh=nan(8,5,448,448);% reorganzied into 8 x 5 x 488 x 488 then zscore along the first dimention
 d_pcoh=nan(8,5,448,448);
 for freq =1:5
-    d_coh(:,freq,:,:)=zr_coh(:,freq,:,:)-mean(zr_coh(:,freq,:,:),1);
-    d_pcoh(:,freq,:,:)=zr_pcoh(:,freq,:,:)-mean(zr_pcoh(:,freq,:,:),1);
+    d_coh(:,freq,:,:)=zr_coh(:,freq,:,:)-repmat(mean(zr_coh(:,freq,:,:),1),8,1,1,1);
+    d_pcoh(:,freq,:,:)=zr_pcoh(:,freq,:,:)-repmat(mean(zr_pcoh(:,freq,:,:),1),8,1,1);
 end
 % plot
 A=d_coh;
 A=d_pcoh;
 for freq=1:5
-    figure;
+    figure('units','normalized','outerposition',[0 0 1 1]);
     sgtitle(bandlabels{freq})
     i = 1;
     for syn =1:2
@@ -170,6 +171,7 @@ for freq=1:5
         end
     end
 end
+
 
 
 %% Examine number of edges from Partial coherence in different conditions
@@ -279,7 +281,89 @@ for syn =1:2
 end
 
 
+%% corrrelation paring condition
+% sc_coh=cell(2,4,5); % 448x448x36 trial within each cell
+% sc_pcoh=cell(2,4,5); % 448x448x36 trial within each cell
+corr_coh_sampl=cell(3,5,2,448,448);% 3 states x 5 freq x 2 subjects x 448x448 x 36 trial within each cell
+corr_pcoh_sampl=cell(3,5,2,448,448);
+for freq =1:5
+    tic
+    for i=1:448
+        for j=1:448
+        % uncouple
+        corr_coh_sampl{1,freq,1,i,j}=squeeze(sc_coh{1,1,freq}(i,j,:)); % subject L
+        corr_coh_sampl{1,freq,2,i,j}=squeeze(sc_coh{2,1,freq}(i,j,:)); % subject R
+        corr_pcoh_sampl{1,freq,1,i,j}=squeeze(sc_pcoh{1,1,freq}(i,j,:)); % subject L
+        corr_pcoh_sampl{1,freq,2,i,j}=squeeze(sc_pcoh{2,1,freq}(i,j,:)); % subject R
+        % unidirectional
+        corr_coh_sampl{2,freq,1,i,j}=cat(1,squeeze(sc_coh{1,2,freq}(i,j,:)),squeeze(sc_coh{2,2,freq}(i,j,:))); % Leader
+        corr_coh_sampl{2,freq,2,i,j}=cat(1,squeeze(sc_coh{1,3,freq}(i,j,:)),squeeze(sc_coh{2,3,freq}(i,j,:))); % Follower
+        corr_pcoh_sampl{2,freq,1,i,j}=cat(1,squeeze(sc_pcoh{1,2,freq}(i,j,:)),squeeze(sc_pcoh{2,2,freq}(i,j,:))); % Leader
+        corr_pcoh_sampl{2,freq,2,i,j}=cat(1,squeeze(sc_pcoh{1,3,freq}(i,j,:)),squeeze(sc_pcoh{2,3,freq}(i,j,:))); % Follower
+        % bidirectional
+        corr_coh_sampl{3,freq,1,i,j}=squeeze(sc_coh{1,4,freq}(i,j,:)); % subject L
+        corr_coh_sampl{3,freq,2,i,j}=squeeze(sc_coh{2,4,freq}(i,j,:)); % subject R
+        corr_pcoh_sampl{3,freq,1,i,j}=squeeze(sc_pcoh{1,4,freq}(i,j,:)); % subject L
+        corr_pcoh_sampl{3,freq,2,i,j}=squeeze(sc_pcoh{2,4,freq}(i,j,:)); % subject R
+        end
+    end
+    toc % 15s 
+end
+% 1.25 min
 
 
+corr_coh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
+corr_pcoh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
+for st=1:3
+    for freq=1:5
+        tic
+        for i=1:448
+            for j=1:448
+                A=corr_coh_sampl{st,freq,1,i,j};
+                B=corr_coh_sampl{st,freq,2,i,j};
+                corr_coh(st,freq,i,j)=corr(A,B);
+               
+                A=corr_pcoh_sampl{st,freq,1,i,j};
+                B=corr_pcoh_sampl{st,freq,2,i,j};
+                corr_pcoh(st,freq,i,j)=corr(A,B);
+            end
+        end
+        toc % 15 s
+    end
+end
 
+% find the sources with correlations of 'Independent' < 'Unidirectional' < 'Bidirectional'
+corr_dg_ctr_matched=nan(3,5,448);
+for freq=1:5
+    for sr=1:448
+       if ((corr_dg_ctr(1,freq,sr)+0.2) < corr_dg_ctr(2,freq,sr)) && (corr_dg_ctr(2,freq,sr) < (corr_dg_ctr(3,freq,sr)-0.2)) ...
+               && (abs(corr_dg_ctr(1,freq,sr))<0.4) && (corr_dg_ctr(3,freq,sr)>0.6)
+           corr_dg_ctr_matched(1,freq,sr)=corr_dg_ctr(1,freq,sr);
+           corr_dg_ctr_matched(2,freq,sr)=corr_dg_ctr(2,freq,sr);
+           corr_dg_ctr_matched(3,freq,sr)=corr_dg_ctr(3,freq,sr);
+       end
+    end
+end
 
+figure
+clf
+direction3names={'Independent','Unidirectional','Bidirectional'};
+dire3colors=[darkgreen;brown;megenta];
+for freq=1:5
+    subplot(5,1,freq)
+    hold on
+    plot(1:448,squeeze(corr_dg_ctr_matched(1,freq,:)),'.','color',dire3colors(1,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(2,freq,:)),'.','color',dire3colors(2,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(3,freq,:)),'.','color',dire3colors(3,:),'MarkerSize',12);
+    xlabel('sources');ylabel('correlation');
+    ylim([-0.4 1]);
+    title(bandlabels{freq});
+    hold off;
+    if freq ==1
+        legend(direction3names)
+    end
+    grid on
+end
+sgtitle({'Correlation of degreee centrality between subject pair', ...
+    'show only sources with correlation of Independent+0.2<Unidirectional<Bidirectional-0.2 && abs(Independent)<0.4 && Bidirectional>0.6'});
+set(gcf,'color','w'); 
