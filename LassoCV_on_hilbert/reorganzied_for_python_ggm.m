@@ -28,3 +28,53 @@ for ses=12%12
     end
     toc
 end
+
+%%
+load('prec_all_ses_6_7.mat');
+prec_all_ses_7_8=prec_all;
+ses=7;subj=1;tr=5;freq=3;
+prec=squeeze(prec_all_ses_7_8(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_0_1.mat')
+prec_all_ses_1_2=prec_all;
+ses=2;subj=2;tr=5;freq=1;
+prec=squeeze(prec_all_ses_1_2(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_10.mat') % hnla works % ramesh?
+prec_all_ses_11=prec_all;
+ses=11;subj=2;tr=3;freq=3;
+prec=squeeze(prec_all_ses_11(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_11.mat') % ramesh
+prec_all_ses_12=prec_all;
+ses=12;subj=2;tr=5;freq=2;
+prec=squeeze(prec_all_ses_12(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_9.mat') % hnla
+prec_all_ses_10=prec_all;
+ses=10;subj=1;tr=6;freq=2;
+prec=squeeze(prec_all_ses_10(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_4.mat') % ramesh
+prec_all_ses_5=prec_all;
+ses=10;subj=1;tr=6;freq=2;
+prec=squeeze(prec_all_ses_5(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+load('prec_all_ses_5.mat') % hnla
+prec_all_ses_6=prec_all;
+ses=6;subj=2;tr=6;freq=1;
+prec=squeeze(prec_all_ses_6(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+
+
+load('prec_all_ses_2_3.mat') % hnlb
+prec_all_ses_3_4=prec_all;
+ses=4;subj=2;tr=6;freq=5;
+prec=squeeze(prec_all_ses_3_4(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
