@@ -30,7 +30,9 @@ for ses=12%12
 end
 
 %%
-cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data
+clear
+tic
+cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
 prec_all_ses_1_12=zeros(12,2,12,5,896,896);
 
 clear prec_all
@@ -74,6 +76,14 @@ imagesc(logical(prec));colorbar
 prec_all_ses_1_12(7:8,:,:,:,:,:)=prec_all_ses_7_8(7:8,:,:,:,:,:);
 clear prec_all_ses_7_8 prec_all
 
+load('prec_all_ses_8.mat') 
+prec_all_ses_9=prec_all;
+ses=9;subj=1;tr=6;freq=2;
+prec=squeeze(prec_all_ses_9(ses,subj,tr,freq,:,:));
+imagesc(logical(prec));colorbar
+prec_all_ses_1_12(9,:,:,:,:,:)=prec_all_ses_9(9,:,:,:,:,:);
+clear prec_all_ses_9 prec_all
+
 load('prec_all_ses_9.mat') % hnla
 prec_all_ses_10=prec_all;
 ses=10;subj=1;tr=6;freq=2;
@@ -99,21 +109,23 @@ prec_all_ses_1_12(12,:,:,:,:,:)=prec_all_ses_12(12,:,:,:,:,:);
 clear prec_all_ses_12 prec_all
 
 cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
-prec_all_ses_1_12=prec_all_ses_0_12;
-clear prec_all_ses_0_12
-save('prec_all_ses_1_12.mat','prec_all_ses_1_12',v=7.3);
+save('prec_all_ses_1_12.mat','prec_all_ses_1_12','-v7.3');
+toc 
 
 figure
-for ses=1:12
+sumpre_all=nan(12,2,12,5);
+for ses=1:12 
     for subj=1:2
         for tr=1:12
             for freq=1:5
                 prec=squeeze(prec_all_ses_1_12(ses,subj,tr,freq,:,:));
-                imagesc(logical(prec));colorbar
-                title(['sum of prec = ' num2str(sum(triu(prec,1),"all"))]);
+                imagesc(logical(prec));colorbar;
+                sumprec=sum(triu(prec,1),"all");
+                title(['sum of prec = ' num2str(sumprec)]);
+                sumpre_all(ses,subj,tr,freq)=sumprec;
                 subtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' tr ' num2str(tr) ...
                     ' freq ' num2str(freq)])
-                pause(0.25)
+                pause(0.1)
             end
         end
     end
