@@ -110,7 +110,7 @@ clear prec_all_ses_12 prec_all
 
 cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
 save('prec_all_ses_1_12.mat','prec_all_ses_1_12','-v7.3');
-toc 
+toc % 300s
 
 figure
 sumpre_all=nan(12,2,12,5);
@@ -131,7 +131,75 @@ for ses=1:12
     end
 end
 
+%%
+% convert to complex prec
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
+Complex_prec_all=nan(12,2,12,5,448,448);
+tic
+for ses=1:12
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                Complex_prec_all(ses,subj,tr,freq,:,:)=r2c(squeeze(prec_all_ses_1_12(ses,subj,tr,freq,:,:)));
+            end
+        end
+    end
+end
+toc
 
+% normalize to real coherence
+cd /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util
+coh_lasso=nan(12,2,12,5,448,448);
+tic
+for ses=1:12
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                coh_lasso(ses,subj,tr,freq,:,:)=normalizeCSD(squeeze(Complex_prec_all(ses,subj,tr,freq,:,:)));
+            end
+        end
+    end
+end
+toc % 10s
+cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
+Pcoh_lasso=coh_lasso;
+save('Pcoh_lasso.mat','Pcoh_lasso','-v7.3');
 
+figure
+for ses=1:12 
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                matshow=logical(squeeze(coh_lasso(ses,subj,tr,freq,:,:)));
+                imagesc(matshow);
+                sumedge=sum(triu(matshow,1),"all");
+                title(['sum of prec = ' num2str(sumedge)]);
+                sumedge_all(ses,subj,tr,freq)=sumedge;
+                subtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' tr ' num2str(tr) ...
+                    ' freq ' num2str(freq)])
+                pause(0.1)
+            end
+        end
+    end
+end
 
+%% compute # edges in and out
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('SC.mat');
+n_in=sum(triu(SC,1),'all'); % total number of edges inside SC
+n_out=sum(triu(~SC,1),'all'); % total number of edges outside SC
 
+% compute number of edges 
+NedgeIn_coh=nan(12,2,12,5); % inside SC
+NedgeOut_coh=nan(12,2,12,5); % outside SC
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                G=logical(squeeze(coh_lasso(ses,subj,tr,freq,:,:)));
+                NedgeIn_coh(ses,subj,tr,freq) = sum(G.*triu(SC,1),'all');
+                NedgeOut_coh(ses,subj,tr,freq) =  sum(G.*triu(~SC,1),'all');
+            end
+        end
+    end
+end

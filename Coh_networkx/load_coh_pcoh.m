@@ -367,3 +367,5 @@ end
 sgtitle({'Correlation of degreee centrality between subject pair', ...
     'show only sources with correlation of Independent+0.2<Unidirectional<Bidirectional-0.2 && abs(Independent)<0.4 && Bidirectional>0.6'});
 set(gcf,'color','w'); 
+
+%% compute #edges in and out

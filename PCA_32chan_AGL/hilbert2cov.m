@@ -109,6 +109,7 @@ end
 % save('hilbert_dataCov_all.mat','hilbert_dataCov_all','-v7.3');
 
 % convert to complex covariance
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
 Complex_dataCov_all=nan(12,2,12,5,448,448);
 for ses=1:numSes
     for subj=1:2
