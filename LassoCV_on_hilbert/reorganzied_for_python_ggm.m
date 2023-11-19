@@ -203,3 +203,259 @@ for ses =1:12
         end
     end
 end
+%% 2X4 condi
+% organzied into 2 syn type and 4 conditons
+NedgeIn_coh4=cell(2,4,5); 
+NedgeOut_coh4=cell(2,4,5);
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                if ismember(tr,[1 2 3]) && ismember(ses,[1:2:11]); % uncouple synch
+                    NedgeIn_coh4{1,1,freq}=[NedgeIn_coh4{1,1,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{1,1,freq}=[NedgeOut_coh4{1,1,freq} NedgeOut_coh(ses,subj,tr,freq)];
+                elseif ismember(tr,[1 2 3]) && ismember(ses,[2:2:12]); % uncouple synco
+                    NedgeIn_coh4{2,1,freq}=[NedgeIn_coh4{2,1,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{2,1,freq}=[NedgeOut_coh4{2,1,freq} NedgeOut_coh(ses,subj,tr,freq)];
+
+                elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[1:2:11]); % leading synch
+                    NedgeIn_coh4{1,2,freq}=[NedgeIn_coh4{1,2,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{1,2,freq}=[NedgeOut_coh4{1,2,freq} NedgeOut_coh(ses,subj,tr,freq)];
+                elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[2:2:12]); % leading synco
+                    NedgeIn_coh4{2,2,freq}=[NedgeIn_coh4{2,2,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{2,2,freq}=[NedgeOut_coh4{2,2,freq} NedgeOut_coh(ses,subj,tr,freq)];
+
+                elseif ((ismember(tr,[4:6]) && subj==2) || (ismember(tr,[7:9]) && subj==1)) && ismember(ses,[1:2:11]); % following synch
+                    NedgeIn_coh4{1,3,freq}=[NedgeIn_coh4{1,3,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{1,3,freq}=[NedgeOut_coh4{1,3,freq} NedgeOut_coh(ses,subj,tr,freq)];
+                elseif ((ismember(tr,[4:6]) && subj==2) || (ismember(tr,[7:9]) && subj==1)) && ismember(ses,[2:2:12]); % following synco
+                    NedgeIn_coh4{2,3,freq}=[NedgeIn_coh4{2,3,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{2,3,freq}=[NedgeOut_coh4{2,3,freq} NedgeOut_coh(ses,subj,tr,freq)];
+
+                elseif ismember(tr,[10:12]) && ismember(ses,[1:2:11]); % mutual synch
+                    NedgeIn_coh4{1,4,freq}=[NedgeIn_coh4{1,4,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{1,4,freq}=[NedgeOut_coh4{1,4,freq} NedgeOut_coh(ses,subj,tr,freq)];
+                else ismember(tr,[10:12]) && ismember(ses,[2:2:12]); % mutual synco
+                    NedgeIn_coh4{2,4,freq}=[NedgeIn_coh4{2,4,freq} NedgeIn_coh(ses,subj,tr,freq)];
+                    NedgeOut_coh4{2,4,freq}=[NedgeOut_coh4{2,4,freq} NedgeOut_coh(ses,subj,tr,freq)];
+                end
+            end
+        end
+    end
+end
+
+% compute the mean and standard error
+NedgeIn_coh4mean=nan(2,4,5);
+NedgeOut_coh4mean=nan(2,4,5);
+NedgeIn_coh4ste=nan(2,4,5);
+NedgeOut_coh4ste=nan(2,4,5);
+for syn=1:2
+    for con=1:4
+        for freq=1:5
+            NedgeIn_coh4mean(syn,con,freq)=mean(NedgeIn_coh4{syn,con,freq});
+            NedgeOut_coh4mean(syn,con,freq)=mean(NedgeOut_coh4{syn,con,freq});
+            NedgeIn_coh4ste(syn,con,freq)=std(NedgeIn_coh4{syn,con,freq})/sqrt(length(NedgeIn_coh4{syn,con,freq}));
+            NedgeOut_coh4ste(syn,con,freq)=std(NedgeOut_coh4{syn,con,freq})/sqrt(length(NedgeOut_coh4{syn,con,freq}));
+        end
+    end
+end
+
+%% plotting
+% load labels and colors for plots
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/Coh_networkx
+run plotting_scheme.m
+figure
+for syn =1:2
+    subplot(1,2,syn);
+    model_series=(squeeze(NedgeIn_coh4mean(syn,:,:)))'/n_in;
+    model_error=(squeeze(NedgeIn_coh4ste(syn,:,:)))'/n_in;
+    b=bar(model_series,'grouped');
+    % Calculate the number of groups and number of bars in each group
+    [ngroups,nbars] = size(model_series);
+    % Get the x coordinate of the bars
+    x = nan(nbars, ngroups);
+    for i = 1:nbars
+        b(i).FaceColor=condicolors(i,:);
+        x(i,:) = b(i).XEndPoints;
+    end
+    % Plot the errorbars 
+    hold on;
+    errorbar(x', model_series, model_error,'k','linestyle','none','LineWidth',2);
+    ylabel(['prt of edges'])
+    xticks([1:5])
+    xticklabels(bandlabels)
+    
+    legend(condi4names)
+    % ylim([0.05 0.3])
+    title(['inside SC: ' syn2names{syn}],'color',syn2colors(syn,:));
+end
+
+
+%% Examine average coh and pcoh in 2x4 conditions inside SC 
+cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
+load('SC.mat');
+% aggreate coh and pcoh inside SC for 2x4 condi
+sc_coh_lasso=cell(2,4,5); % 448x448x36 trial within each cell
+tic
+for ses =1:12
+    for subj = 1:2
+        for tr =1:12
+            for freq=1:5
+                coh_las=squeeze(coh_lasso(ses,subj,tr,freq,:,:)).*SC; % investigate only within SC
+
+                if ismember(tr,[1 2 3]) && ismember(ses,[1:2:11]); % uncouple synch
+                    sc_coh_lasso{1,1,freq}=cat(3,sc_coh_lasso{1,1,freq},coh_las);
+                elseif ismember(tr,[1 2 3]) && ismember(ses,[2:2:12]); % uncouple synco
+                    sc_coh_lasso{2,1,freq}=cat(3,sc_coh_lasso{2,1,freq},coh_las);
+
+                elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[1:2:11]); % leading synch
+                    sc_coh_lasso{1,2,freq}=cat(3,sc_coh_lasso{1,2,freq},coh_las);
+                elseif ((ismember(tr,[4:6]) && subj==1) || (ismember(tr,[7:9]) && subj==2)) && ismember(ses,[2:2:12]); % leading synco
+                    sc_coh_lasso{2,2,freq}=cat(3,sc_coh_lasso{2,2,freq},coh_las);
+
+                elseif ((ismember(tr,[4:6]) && subj==2) || (ismember(tr,[7:9]) && subj==1)) && ismember(ses,[1:2:11]); % following synch
+                    sc_coh_lasso{1,3,freq}=cat(3,sc_coh_lasso{1,3,freq},coh_las);
+                elseif ((ismember(tr,[4:6]) && subj==2) || (ismember(tr,[7:9]) && subj==1)) && ismember(ses,[2:2:12]); % following synco
+                    sc_coh_lasso{2,3,freq}=cat(3,sc_coh_lasso{2,3,freq},coh_las);
+
+                elseif ismember(tr,[10:12]) && ismember(ses,[1:2:11]); % mutual synch
+                    sc_coh_lasso{1,4,freq}=cat(3,sc_coh_lasso{1,4,freq},coh_las);
+                else ismember(tr,[10:12]) && ismember(ses,[2:2:12]); % mutual synco
+                    sc_coh_lasso{2,4,freq}=cat(3,sc_coh_lasso{2,4,freq},coh_las);
+                end
+            end
+        end
+    end
+end
+toc % 22s
+
+% mean coh
+m_pcoh=zeros(2,4,5,448,448);
+for syn = 1:2
+    for condi = 1:4
+        for freq = 1:5
+            m_pcoh(syn,condi,freq,:,:)=mean(sc_coh_lasso{syn,condi,freq},3);
+        end
+    end
+end
+
+syn=2;
+condi=4;
+freq=5;
+imagesc(logical(squeeze(m_pcoh(syn,condi,freq,:,:))));
+
+% examine the mean in a plot
+A=m_pcoh;
+% plot
+for freq=1:5
+    figure('units','normalized','outerposition',[0 0 1 1]);
+    sgtitle([bandlabels{freq} ' pcoh'])
+    for syn =1:2
+        for condi=1:4
+            subplot(2,4,4*(syn-1)+condi)
+            imagesc(logical(squeeze(A(syn,condi,freq,:,:))));colorbar;
+            colormap('hot');
+            title([syn2names{syn} ' ' condi4names{condi}]);
+        end
+    end
+end
+% plot
+for freq=1:5
+    figure('units','normalized','outerposition',[0 0 1 1]);
+    sgtitle([bandlabels{freq} ' pcoh'])
+    for syn =1:2
+        for condi=1:4
+            subplot(2,4,4*(syn-1)+condi)
+            imagesc(squeeze(A(syn,condi,freq,:,:)));colorbar;
+            colormap('jet');
+            clim([-0.001 0.001])
+            title([syn2names{syn} ' ' condi4names{condi}]);
+        end
+    end
+end
+
+
+%% corrrelation paring condition
+% sc_coh=cell(2,4,5); % 448x448x36 trial within each cell
+% corr_coh_lasso_sampl=cell(2,4,5); % 448x448x36 trial within each cell
+corr_coh_lasso_sampl=cell(3,5,2,448,448);% 3 states x 5 freq x 2 subjects x 448x448 x 36 trial within each cell
+
+for freq =1:5
+    tic
+    for i=1:448
+        for j=1:448
+        % uncouple
+        corr_pcoh_sampl{1,freq,1,i,j}=squeeze(coh_lasso{1,1,freq}(i,j,:)); % subject L
+        corr_pcoh_sampl{1,freq,2,i,j}=squeeze(coh_lasso{2,1,freq}(i,j,:)); % subject R
+        % unidirectional
+        corr_coh_sampl{2,freq,1,i,j}=cat(1,squeeze(sc_coh{1,2,freq}(i,j,:)),squeeze(sc_coh{2,2,freq}(i,j,:))); % Leader
+        corr_coh_sampl{2,freq,2,i,j}=cat(1,squeeze(sc_coh{1,3,freq}(i,j,:)),squeeze(sc_coh{2,3,freq}(i,j,:))); % Follower
+        corr_pcoh_sampl{2,freq,1,i,j}=cat(1,squeeze(sc_coh_lasso{1,2,freq}(i,j,:)),squeeze(sc_coh_lasso{2,2,freq}(i,j,:))); % Leader
+        corr_pcoh_sampl{2,freq,2,i,j}=cat(1,squeeze(sc_coh_lasso{1,3,freq}(i,j,:)),squeeze(sc_coh_lasso{2,3,freq}(i,j,:))); % Follower
+        % bidirectional
+        corr_coh_sampl{3,freq,1,i,j}=squeeze(sc_coh{1,4,freq}(i,j,:)); % subject L
+        corr_coh_sampl{3,freq,2,i,j}=squeeze(sc_coh{2,4,freq}(i,j,:)); % subject R
+        corr_pcoh_sampl{3,freq,1,i,j}=squeeze(sc_coh_lasso{1,4,freq}(i,j,:)); % subject L
+        corr_pcoh_sampl{3,freq,2,i,j}=squeeze(sc_coh_lasso{2,4,freq}(i,j,:)); % subject R
+        end
+    end
+    toc % 15s 
+end
+% 1.25 min
+
+
+corr_coh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
+corr_pcoh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
+for st=1:3
+    for freq=1:5
+        tic
+        for i=1:448
+            for j=1:448
+                A=corr_coh_sampl{st,freq,1,i,j};
+                B=corr_coh_sampl{st,freq,2,i,j};
+                corr_coh(st,freq,i,j)=corr(A,B);
+               
+                A=corr_pcoh_sampl{st,freq,1,i,j};
+                B=corr_pcoh_sampl{st,freq,2,i,j};
+                corr_pcoh(st,freq,i,j)=corr(A,B);
+            end
+        end
+        toc % 15 s
+    end
+end
+
+% find the sources with correlations of 'Independent' < 'Unidirectional' < 'Bidirectional'
+corr_dg_ctr_matched=nan(3,5,448);
+for freq=1:5
+    for sr=1:448
+       if ((corr_dg_ctr(1,freq,sr)+0.2) < corr_dg_ctr(2,freq,sr)) && (corr_dg_ctr(2,freq,sr) < (corr_dg_ctr(3,freq,sr)-0.2)) ...
+               && (abs(corr_dg_ctr(1,freq,sr))<0.4) && (corr_dg_ctr(3,freq,sr)>0.6)
+           corr_dg_ctr_matched(1,freq,sr)=corr_dg_ctr(1,freq,sr);
+           corr_dg_ctr_matched(2,freq,sr)=corr_dg_ctr(2,freq,sr);
+           corr_dg_ctr_matched(3,freq,sr)=corr_dg_ctr(3,freq,sr);
+       end
+    end
+end
+
+figure
+clf
+direction3names={'Independent','Unidirectional','Bidirectional'};
+dire3colors=[darkgreen;brown;megenta];
+for freq=1:5
+    subplot(5,1,freq)
+    hold on
+    plot(1:448,squeeze(corr_dg_ctr_matched(1,freq,:)),'.','color',dire3colors(1,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(2,freq,:)),'.','color',dire3colors(2,:),'MarkerSize',12);
+    plot(1:448,squeeze(corr_dg_ctr_matched(3,freq,:)),'.','color',dire3colors(3,:),'MarkerSize',12);
+    xlabel('sources');ylabel('correlation');
+    ylim([-0.4 1]);
+    title(bandlabels{freq});
+    hold off;
+    if freq ==1
+        legend(direction3names)
+    end
+    grid on
+end
+sgtitle({'Correlation of degreee centrality between subject pair', ...
+    'show only sources with correlation of Independent+0.2<Unidirectional<Bidirectional-0.2 && abs(Independent)<0.4 && Bidirectional>0.6'});
+set(gcf,'color','w'); 

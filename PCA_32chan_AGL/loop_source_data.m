@@ -50,7 +50,7 @@ cd ../../Cleaned_data
 % end
 
 cd ../../MEG_EEG_Source_Localization/PCA_32chan_AGL
-for r=8%1:numSes
+for r=1:numSes
     vars = ({'runid', 'data preprocessed_eeg', 'EEG_ori', 'source_data', 'EEG_recon', 'leakage'});
     clear(vars{:});
     runid = num2str(seeds(r,:));
