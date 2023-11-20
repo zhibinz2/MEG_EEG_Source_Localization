@@ -34,4 +34,4 @@ for ses=1:12
     end
 end
 
-%%
+%% convert back to complex and then normalize to cross spetra
