@@ -14,7 +14,7 @@ ses=12;
 subj=2;
 tr=12;
 freq=5;
-imagesc(squeeze(chan_prec_all(ses,subj,tr,freq,:,:)));
+imagesc(squeeze(chan_prec_all(ses,subj,tr,freq,:,:))); %64x64
 
 for ses=1:12
     for subj=1:2
@@ -94,13 +94,11 @@ for ses=1:12
         end
     end
 end
-
 % mean
 coh32_mean_5freq=nan(5,32,32);
 for freq=1:5
     coh32_mean_5freq(freq,:,:)=mean(coh_5freq{freq},3);
 end
-
 % plot
 figure
 clf
@@ -115,13 +113,39 @@ sgtitle('boolean partial coherence in channel space averaged')
 
 chan_pcoh_boolean_5freq=coh_5freq;
 
+coh_5freq=chan_pcoh_boolean_5freq;
+
+
+% convert to zscore
+coh_5all=cat(3,coh_5freq{1},coh_5freq{2},coh_5freq{3},coh_5freq{4},coh_5freq{5});
+coh_5zscore=zscore(coh_5all,[],3);
+% mean
+coh32_mean_5freq=nan(5,32,32);
+for freq=1:5
+    coh32_mean_5freq(freq,:,:)=mean(coh_5zscore(:,:,[[1:288]+288*(freq-1)]),3);
+end
+% plot
+figure
+clf
+bandlabels = {'Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2'};
+for freq=1:5
+    subplot(1,5,freq)
+    imagesc(squeeze(coh32_mean_5freq(freq,:,:)));colorbar
+    colormap('jet')
+    title(bandlabels{freq})
+    clim([-0.5 0.5])
+end
+sgtitle('zscore: boolean partial coherence in channel space averaged')
+
+
+
 %% examine all trial
 load('chan_cov_all.mat')
 ses=12;
 subj=2;
 tr=12;
 freq=5;
-imagesc(squeeze(chan_cov_all(ses,subj,tr,freq,:,:)));
+imagesc(squeeze(chan_cov_all(ses,subj,tr,freq,:,:))); % 64x64
 colorbar;
 
 figure
@@ -169,6 +193,7 @@ for ses=1:numSes
         end
     end
 end
+% save to 'chan_5freq.mat' under /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 
 % examine all trial
 for ses=1:12
@@ -203,6 +228,7 @@ for ses=1:12
         end
     end
 end
+
 % mean
 coh32_mean_5freq=nan(5,32,32);
 for freq=1:5

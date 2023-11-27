@@ -14,7 +14,7 @@ ses=12;
 subj=2;
 tr=12;
 freq=5;
-imagesc(squeeze(chan_prec_all(ses,subj,tr,freq,:,:)));
+imagesc(squeeze(chan_prec_all(ses,subj,tr,freq,:,:))); %64x64
 
 for ses=1:12
     for subj=1:2
@@ -145,7 +145,7 @@ ses=12;
 subj=2;
 tr=12;
 freq=5;
-imagesc(squeeze(chan_cov_all(ses,subj,tr,freq,:,:)));
+imagesc(squeeze(chan_cov_all(ses,subj,tr,freq,:,:))); % 64x64
 colorbar;
 
 figure
@@ -193,6 +193,7 @@ for ses=1:numSes
         end
     end
 end
+% save to 'chan_5freq.mat' under /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 
 % examine all trial
 for ses=1:12
@@ -227,6 +228,7 @@ for ses=1:12
         end
     end
 end
+
 % mean
 coh32_mean_5freq=nan(5,32,32);
 for freq=1:5
