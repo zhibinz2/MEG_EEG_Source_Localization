@@ -128,8 +128,7 @@ for freq=1:5
         for j=1:32
 %            if ((corr_coh(1,freq,i,j)+0.2) < corr_coh(2,freq,i,j)) && (corr_coh(2,freq,i,j) < (corr_coh(3,freq,i,j)-0.2)) ...
 %                     && (abs(corr_coh(1,freq,i,j))<0.4) && (corr_coh(3,freq,i,j)>0.6)
-           if (abs(corr_coh(1,freq,i,j))<0.4) && (corr_coh(3,freq,i,j)>0.6) && (corr_coh(2,freq,i,j)>0.4) ...
-               && (corr_coh(2,freq,i,j) < (corr_coh(3,freq,i,j)))
+           if (abs(corr_coh(1,freq,i,j))<0.4) && (corr_coh(3,freq,i,j)>0.6) && (corr_coh(2,freq,i,j) < (corr_coh(3,freq,i,j)))
 %                corr_matched(1,freq,i,j)=corr_coh(1,freq,i,j);
 %                corr_matched(2,freq,i,j)=corr_coh(2,freq,i,j);
 %                corr_matched(3,freq,i,j)=corr_coh(3,freq,i,j);
@@ -158,11 +157,10 @@ for freq=1:5
 %         legend(direction3names)
 %     end
 %     grid on
-    imagesc(squeeze(corr_matched3(freq,:,:)));colorbar;clim([0 1]);title(bandlabels{freq});
-    xlabel('channel');ylabel('channel');
+    imagesc(squeeze(corr_matched3(freq,:,:)));colorbar;clim([0 1]);
 end
 sgtitle({'Correlation of coherence between subject pair', ...
-    'show only sources with correlation of Independent<Unidirectional<Bidirectional && abs(Independent)<0.4 && Unidirectional>0.4 && Bidirectional>0.6'});
+    'show only sources with correlation of Independent+0.2<Unidirectional<Bidirectional-0.2 && abs(Independent)<0.4 && Bidirectional>0.6'});
 set(gcf,'color','w'); 
 
 %%

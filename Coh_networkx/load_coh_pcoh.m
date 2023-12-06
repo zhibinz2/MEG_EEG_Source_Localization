@@ -311,7 +311,7 @@ for freq =1:5
 end
 % 1.25 min
 
-
+% compute correlation
 corr_coh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
 corr_pcoh=nan(3,5,448,448); % 3 states x 5 freq x 448 x 448 edges
 for st=1:3
