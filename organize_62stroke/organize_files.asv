@@ -1,6 +1,49 @@
 % original data
 cd ../../archive/EEG_StrokePatients_n61/
 
+% combine files
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/HORR
+load('HORR_DNDB78_20111214_14421.mat')
+data1=Data;
+load('HORR_DNDB78_20111214_14422.mat')
+data2=Data;
+load('HORR_DNDB78_20111214_14423.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save("HORR_DNDB78_20111214_all.mat","Data")
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/MAVP
+load('MAVP_PWKZ25_20120118_14351.mat')
+data1=Data;
+load('MAVP_PWKZ25_20120118_14352.mat')
+data2=Data;
+load('MAVP_PWKZ25_20120118_14353.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save("MAVP_PWKZ25_20120118_all.mat",'Data')
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/MUNE
+load('MUNE_XIUV73_20120215_12491.mat')
+data1=Data;
+load('MUNE_XIUV73_20120215_12492.mat')
+data2=Data;
+load('MUNE_XIUV73_20120215_12493.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save('MUNE_XIUV73_20120215_all.mat','Data')
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/SARB
+load('SARB_QJQJ79_20120208_14231.mat')
+data1=Data;
+load('SARB_QJQJ79_20120208_14232.mat')
+data2=Data;
+load('SARB_QJQJ79_20120208_14233.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save('SARB_QJQJ79_20120208_all.mat',"Data")
+
+
+
 
 %%
 % renamed accoording to post stroke days
@@ -450,21 +493,17 @@ cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
 penalizationIn_op=nan(1,5);
 penalizationOut_op=nan(1,5);
 minDev_op3=nan(1,5);
+X=nan(5,896,896)
 for freq=1:5
     tic
     dataCovs_op=squeeze(datapermuted_cov{freq});
     [penalizationIn_op(freq),penalizationOut_op(freq),minDev_op3(freq)]=penaltyselection( ...
         SC,allLambdas,allLambdasOut,dataCovs_op);
-    toc
-    tic
     dataCov=hilbert_dataCov{freq};
     [X(freq,:,:)] = fitprecision( ...
         SC,penalizationIn_op(freq),penalizationOut_op(freq),min_LamdaIn,dataCov);
     toc 
     % 4 ensames each freq takes 964 s = 82 hours for 62 files
-    % 2 ensames each freq takes 482 s = 41 hours for 62 files
+    % 2 ensames each freq takes 440 s = 37 hours for 62 files
 end
 
-% fit precision
-cd 
-freq = 1;

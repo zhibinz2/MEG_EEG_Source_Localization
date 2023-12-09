@@ -1,6 +1,57 @@
 % original data
 cd ../../archive/EEG_StrokePatients_n61/
 
+% combine files
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/HORR
+load('HORR_DNDB78_20111214_14421.mat')
+data1=Data;
+load('HORR_DNDB78_20111214_14422.mat')
+data2=Data;
+load('HORR_DNDB78_20111214_14423.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save("HORR_DNDB78_20111214_all.mat","Data")
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/MAVP
+load('MAVP_PWKZ25_20120118_14351.mat')
+data1=Data;
+load('MAVP_PWKZ25_20120118_14352.mat')
+data2=Data;
+load('MAVP_PWKZ25_20120118_14353.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save("MAVP_PWKZ25_20120118_all.mat",'Data')
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/MUNE
+load('MUNE_XIUV73_20120215_12491.mat')
+data1=Data;
+load('MUNE_XIUV73_20120215_12492.mat')
+data2=Data;
+load('MUNE_XIUV73_20120215_12493.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save('MUNE_XIUV73_20120215_all.mat','Data')
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/SARB
+load('SARB_QJQJ79_20120208_14231.mat')
+data1=Data;
+load('SARB_QJQJ79_20120208_14232.mat')
+data2=Data;
+load('SARB_QJQJ79_20120208_14233.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save('SARB_QJQJ79_20120208_all.mat',"Data")
+
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_StrokePatients_n61/STAP
+load('STAP_EXNZ50_20111221_12381.mat')
+data1=Data;
+load('STAP_EXNZ50_20111221_12382.mat')
+data2=Data;
+load('STAP_EXNZ50_20111221_12383.mat')
+data3=Data;
+Data=cat(2,data1,data2,data3);
+save('STAP_EXNZ50_20111221_all.mat','Data');
+
 
 %%
 % renamed accoording to post stroke days
