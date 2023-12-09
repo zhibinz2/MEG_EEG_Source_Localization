@@ -137,8 +137,6 @@ for freq=1:5
 end
 sgtitle('zscore: boolean partial coherence in channel space averaged')
 
-
-
 %% examine all trial
 load('chan_cov_all.mat')
 ses=12;
