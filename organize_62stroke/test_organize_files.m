@@ -53,10 +53,13 @@ Data=cat(2,data1,data2,data3);
 save('STAP_EXNZ50_20111221_all.mat','Data');
 
 
+
 %%
 % renamed accoording to post stroke days
+open /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/organize_62stroke/lesion_site_62subj_sort.xls
 cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_reorganized
 subject_ID=0;
+subj_files=[0:1:60];
 load([num2str(subject_ID) '.mat']);
 
 % below refer to /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_spacing_ESCH/step1_EEG_prepocess.m
