@@ -75,7 +75,7 @@ for n = 1:length(goodepoch)
 end
 
 clearvars good_epochdata epochdata epochstd eegstd cahnstd
-clearvars chan_threshold var_threshold
+clearvars chan_threshold var_threshold filtered_data
 
 %% extract good chanlocs
 chanlocs = load('/home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/EEG_streamline_DAON/chanlocs.mat');
@@ -425,12 +425,12 @@ for freq=1:5
     sourceDataReal = cat(1,real(hilbertdata),imag(hilbertdata));
     sourceDataReal = [sourceDataReal*(1/mean(abs(sourceDataReal(:))))]'; % normalize data
     % split into 4 ensambles: 4 x #source x #(samples/4)
-    n_split=4; n_sr=size(sourceDataReal,2);
+    n_split=2; n_sr=size(sourceDataReal,2);
     sam_len=size(sourceDataReal,1);
     sam_size=floor(sam_len/n_split); sam_range=1:sam_size;
     sourceDataReal = sourceDataReal(1:n_split*sam_size,:);
     datareshaped = reshape(sourceDataReal, sam_size, n_split, n_sr);
-    datapermuted{freq} = permute(datareshaped,[2,3,1]); % split into 4 ensambles: 4x896x9300
+    datapermuted{freq} = permute(datareshaped,[2,3,1]); % split into 2 ensambles: 2x896x9300
     % compute covariance
     hilbert_dataCov{freq} = cov(sourceDataReal);
     for n=1:n_split
@@ -440,17 +440,31 @@ end
 toc % 9 s
 
 cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert
-save([num2str(subject_ID) '.mat'],'hilbert_dataCov','datapermuted_cov','datapermuted');
+save([num2str(subject_ID) '.mat'],'hilbert_dataCov','datapermuted_cov');
 
 clear agr_source_data datareshaped downsample_data EEG_recon filterd_data filtered_data
-% penalty selection
+clear hilbertdata preprocessed_eeg sourceDataReal
+
+% penalty selection and fit precision
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
-penalizationIn_op3=nan(5);
-penalizationOut_op3=nan(5);
-minDev_op3=nan(5);
+penalizationIn_op=nan(1,5);
+penalizationOut_op=nan(1,5);
+minDev_op3=nan(1,5);
 for freq=1:5
     tic
     dataCovs_op=squeeze(datapermuted_cov{freq});
-    [penalizationIn_op3(freq),penalizationOut_op3(freq),minDev_op3(freq)]=penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
+    [penalizationIn_op(freq),penalizationOut_op(freq),minDev_op3(freq)]=penaltyselection( ...
+        SC,allLambdas,allLambdasOut,dataCovs_op);
     toc
+    tic
+    dataCov=hilbert_dataCov{freq};
+    [X(freq,:,:)] = fitprecision( ...
+        SC,penalizationIn_op(freq),penalizationOut_op(freq),min_LamdaIn,dataCov);
+    toc 
+    % 4 ensames each freq takes 964 s = 82 hours for 62 files
+    % 2 ensames each freq takes 482 s = 41 hours for 62 files
 end
+
+% fit precision
+cd 
+freq = 1;

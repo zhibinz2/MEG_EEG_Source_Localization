@@ -445,20 +445,22 @@ save([num2str(subject_ID) '.mat'],'hilbert_dataCov','datapermuted_cov');
 clear agr_source_data datareshaped downsample_data EEG_recon filterd_data filtered_data
 clear hilbertdata preprocessed_eeg sourceDataReal
 
-% penalty selection
+% penalty selection and fit precision
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
-penalizationIn_op3=nan(1,5);
-penalizationOut_op3=nan(1,5);
+penalizationIn_op=nan(1,5);
+penalizationOut_op=nan(1,5);
 minDev_op3=nan(1,5);
+X=nan(5,896,896)
 for freq=1:5
     tic
     dataCovs_op=squeeze(datapermuted_cov{freq});
-    [penalizationIn_op3(freq),penalizationOut_op3(freq),minDev_op3(freq)]=penaltyselection(SC,allLambdas,allLambdasOut,dataCovs_op);
+    [penalizationIn_op(freq),penalizationOut_op(freq),minDev_op3(freq)]=penaltyselection( ...
+        SC,allLambdas,allLambdasOut,dataCovs_op);
+    dataCov=hilbert_dataCov{freq};
+    [X(freq,:,:)] = fitprecision( ...
+        SC,penalizationIn_op(freq),penalizationOut_op(freq),min_LamdaIn,dataCov);
     toc 
     % 4 ensames each freq takes 964 s = 82 hours for 62 files
-    % 2 ensames each freq takes 482 s = 41 hours for 62 files
+    % 2 ensames each freq takes 440 s = 37 hours for 62 files
 end
 
-% fit precision
-cd 
-freq = 1;
