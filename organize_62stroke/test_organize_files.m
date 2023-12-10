@@ -156,16 +156,16 @@ ch_labels{116}='O1'; ch_labels{150}='O2';
 ch_labels{31}='NAS'; 
 ch_labels{21}='Fz'; ch_labels{101}='Pz'; ch_labels{126}='Oz';
 
-% remove ch_bad to check channel index for eyechans
-goodchanlocs=chanlocs;
-goodchanlocs(ch_peripheral)=[];
+% remove 49 perpheral channels (then to check channel index for eyechans later)
+central_chanlocs=chanlocs;
+central_chanlocs(ch_peripheral)=[];
 
 % remove Cz channel from ch_bad
 ch_peripheral(end)=[];
 ch_peripheral
 
 % use "urchan" to get an array of the orginal index
-urchan=extractfield(goodchanlocs,'urchan');
+urchan=extractfield(central_chanlocs,'urchan');
 
 clearvars c ch chanloc
 
@@ -280,7 +280,7 @@ open goodchanlocs;
 
 ch_dubious=nan(1,length(dubious_chans));
 for i = 1:length(dubious_chans)
-    ch_dubious(i) = goodchanlocs(dubious_chans(i)).urchan;
+    ch_dubious(i) = central_chanlocs(dubious_chans(i)).urchan;
 end
 dubious_chans; % 67    73    81   192   193   199   200   201   202   203   204   205   206   207   208
 ch_dubious;    % 67    73    81   218   219   225   226   227   230   231   248   249   252   253   254
