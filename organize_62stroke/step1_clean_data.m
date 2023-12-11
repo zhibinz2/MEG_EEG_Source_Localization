@@ -348,7 +348,7 @@ sum(triu(SC,1),"all") % 4990 edges
 
 % penalty selection and fit precision
 subj_files=[0:1:60];
-for f=1:2
+for f=3:15
     tic
     cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_corti_source
     load([num2str(subj_files(f)) '.mat'],'corti_source_data','subject_ID', ...
