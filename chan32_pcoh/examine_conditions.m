@@ -1,5 +1,5 @@
 clear
-%%
+%% cov -> coh
 load('chan_cov_all.mat') % 12x2x12x5x64x64 in original order
 % convert back to complex and then normalize to cross spetra
 % convert to complex covariance
@@ -165,7 +165,7 @@ sgtitle({'Correlation of coherence between subject pair', ...
     'show only sources with correlation of Independent<Unidirectional<Bidirectional && abs(Independent)<0.4 && Unidirectional>0.4 && Bidirectional>0.6'});
 set(gcf,'color','w'); 
 
-%%
+%% pcov -> pcoh
 load('chan_prec_all.mat')  % 12x2x12x5x64x64 in original order
 % convert to complex covariance
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL

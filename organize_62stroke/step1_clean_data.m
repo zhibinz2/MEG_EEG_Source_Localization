@@ -265,6 +265,9 @@ corti_ave_source_labl=ave_source_label;
 cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_corti_source
 save('corti_ave_source_coor.mat','corti_ave_source_coor');
 save('corti_ave_source_labl.mat','corti_ave_source_labl');
+% save the cortical roi label names
+corti_roiNames=roiNames_250(corti_ave_source_labl);
+save('corti_roiNames.mat','corti_roiNames');
 
 % get inverse model
 addpath ../../AdaptiveGraphicalLassoforParCoh/Simulations/util
@@ -310,7 +313,7 @@ for f=1:61
 
 end
 
-%% downsample filter hilbert -> coh and partial coh
+%% downsample filter hilbert -> cov and partial cov
 % refer to 
 % open /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL/hilbert2cov.m
 clear
