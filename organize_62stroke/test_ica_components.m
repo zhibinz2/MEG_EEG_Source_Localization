@@ -76,12 +76,15 @@ end
 
 
 %%  
-for f=1:61
+for f=48
     tic
     cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_reorganized
     load([num2str(subj_files(f)) '.mat']);
     subject_ID=subj_files(f);
     display(['start processing subject file: ' num2str(subj_files(f)) '.mat']);
+
+    % down-sample and z-score first
+
 
     % average re-reference
     rData=Data-ones(size(Data,1),1)*mean(Data,1);
@@ -151,7 +154,7 @@ for f=1:61
     end
     corrsmax = max(corrs);
 
-    % detect which components are not too correlated with dubious channels
+    % detect which components are not too correlated with any dubious channels
     badcomponents = abs(corrsmax) >= corr_threshold; 
     display(['bad components: ' num2str(find(badcomponents))] )% display the bad components
     goodcomponents = abs(corrsmax) < corr_threshold;
@@ -160,7 +163,7 @@ for f=1:61
 
     % further detect bad ones in the goodcomponents by examing the weight
     % proportion in A (mixing matrix)
-    proportion_threshold=0.6; % if any cahnnel weighted higher than 0.6 in A
+    proportion_threshold=0.6; % if any channel weighted higher than 0.6 in A of a component
     chancomponents = zeros(size(icasig,1),1);
     B = zeros(nchans,size(icasig,1)); % 208 channel x 208 components
     for n = 1:size(icasig,1) % loop through all 208 components
@@ -181,3 +184,23 @@ for f=1:61
 end
 
 save('ica_good_component_left.mat','ica_good_1','ica_good_2');
+
+%% examine eeg quality
+% 44, 48, 60 have very low number of component left
+% 43.mat, 47.mat, 59.mat
+cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_cleaned
+figure;
+for f=1:61
+    load([num2str(f-1) '.mat'])
+    plotdata=preprocessed_eeg(150:160,10000:11000)';
+    plottime=1:size(plotdata,1);
+    clf;
+    plotx(plottime,plotdata);
+    ylim([-100 100])
+    title(num2str(f-1));
+    subtitle(ica_good_2(f))
+    pause(0.25)
+end
+
+figure;
+imagesc(B);ylabel('channel');xlabel('components');colorbar
