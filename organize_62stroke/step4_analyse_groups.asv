@@ -79,16 +79,9 @@ save('les_ind_p61.mat','les_ind_p61');
 
 %% save pcoh
 subj_files=[0:1:60];
+Pcov=nan(61,)
 for f=1:61
-    cd /home/zhibinz2/Documents/GitHub/archive/EEE_stroke_61_coh
-    load([num2str(subj_files(f)) '.mat'],'stroke_Pcoh');
-    cd /home/zhibinz2/Documents/GitHub/STROKE_P61/pcoh_p61
-    save([num2str(subj_files(f)) '.mat'],'stroke_Pcoh');
-end
+    load([num2str(subj_files(f)) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
+        'subject_ID');
 
-%% save other source info
-clear
-bandlabels = {'Delta','Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2'};
-source_coordinates=corti_ave_source_coor;
-source_roi_index=corti_ave_source_labl;
-save('source_info.mat','source_coordinates','source_roi_index','bandlabels');
+
