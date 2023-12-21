@@ -100,4 +100,100 @@ end
 
 %% penalty selection and fit precision for delta only
 subj_files=[0:1:60];
+for f=3:61
+    tic
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_corti_source
+    load([num2str(subj_files(f)) '.mat'],'corti_source_data','subject_ID', ...
+        'chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
+    display(['start processing subject file: ' num2str(subj_files(f)) '.mat']);
 
+    downsample_data=resample(double(corti_source_data),1,downsample,'Dimension',1);
+    
+    datapermuted=cell(1,6);
+    stroke_Cov=cell(1,6); % coh
+    stroke_Pcov=cell(1,6); % partial coh
+    penalizationIn_op=nan(1,6);
+    penalizationOut_op=nan(1,6);
+    minDev_op=nan(1,6);
+    for freq=1
+        filtered_data = filter(filt_ds{freq},downsample_data);
+        hilbertdata = hilbert(filtered_data');
+        sourceDataReal = cat(1,real(hilbertdata),imag(hilbertdata));
+        sourceDataReal = [sourceDataReal*(1/mean(abs(sourceDataReal(:))))]'; % normalize data
+        % split into 4 ensambles: 4 x #source x #(samples/4)
+        n_split=2; n_sr=size(sourceDataReal,2);
+        sam_len=size(sourceDataReal,1);
+        sam_size=floor(sam_len/n_split); sam_range=1:sam_size;
+        sourceDataReal = sourceDataReal(1:n_split*sam_size,:);
+        datareshaped = reshape(sourceDataReal, sam_size, n_split, n_sr);
+        datapermuted{freq} = permute(datareshaped,[2,3,1]); % split into 2 ensambles: 2x896x9300
+        % compute covariance
+        stroke_Cov{freq} = cov(sourceDataReal);
+        for n=1:n_split
+            datapermuted_cov{freq}(n,:,:) = cov([squeeze(datapermuted{freq}(n,:,:))]');
+        end
+
+        clear corti_source_data filtered_data  hilbertdata
+        clear sourceDataReal datareshaped 
+
+        % AGL
+        cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
+        dataCovs_op=squeeze(datapermuted_cov{freq});
+        [penalizationIn_op(freq),penalizationOut_op(freq),minDev_op(freq)]=penaltyselection( ...
+        SC,allLambdas,allLambdasOut,dataCovs_op);
+        [stroke_Pcov{freq}] = fitprecision( ...
+        SC,penalizationIn_op(freq),penalizationOut_op(freq),min_LamdaIn,stroke_Cov{freq});
+        
+        clear datapermuted_cov dataCovs_op 
+
+    end
+    clear downsample_data datapermuted
+
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert_add_delta
+    save([num2str(subject_ID) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
+        'penalizationIn_op','penalizationOut_op','minDev_op', ...
+        'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
+
+    display(['Complete one file: ' num2str(subj_files(f)) '.mat ********************'])
+    toc
+end
+
+
+%% added delta to other 5 frequency
+for f=1:61
+    tic
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert_add_delta
+    load([num2str(subj_files(f)) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
+        'penalizationIn_op','penalizationOut_op','minDev_op', ...
+        'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert
+    stroke_Cov5f=load([num2str(subj_files(f)) '.mat'],'stroke_Cov');stroke_Cov5f=stroke_Cov5f(1).stroke_Cov;
+    stroke_Pcov5f=load([num2str(subj_files(f)) '.mat'],'stroke_Pcov');stroke_Pcov5f=stroke_Pcov5f(1).stroke_Pcov;
+    penalizationIn_op5f=load([num2str(subj_files(f)) '.mat'],'penalizationIn_op');penalizationIn_op5f=penalizationIn_op5f.penalizationIn_op;
+    penalizationOut_op5f=load([num2str(subj_files(f)) '.mat'],'penalizationOut_op');penalizationOut_op5f=penalizationOut_op5f.penalizationOut_op;
+    minDev_op5f=load([num2str(subj_files(f)) '.mat'],'minDev_op');minDev_op5f=minDev_op5f.minDev_op;
+    subject_ID5f=load([num2str(subj_files(f)) '.mat'],'subject_ID');subject_ID5f=subject_ID5f.subject_ID;
+    chanlocs5f=load([num2str(subj_files(f)) '.mat'],'chanlocs');chanlocs5f=chanlocs5f.chanlocs;
+    ch_labels5f=load([num2str(subj_files(f)) '.mat'],'ch_labels');ch_labels5f=ch_labels5f.ch_labels;
+    ch_dubious5f=load([num2str(subj_files(f)) '.mat'],'ch_dubious');ch_dubious5f=ch_dubious5f.ch_dubious;
+    ch_peripheral5f=load([num2str(subj_files(f)) '.mat'],'ch_peripheral');ch_peripheral5f=ch_peripheral5f.ch_peripheral;
+    for i=2:6
+        stroke_Cov{i}=stroke_Cov5f{i-1};
+        stroke_Pcov{i}=stroke_Pcov5f{i-1};
+        penalizationIn_op(i)=penalizationIn_op5f(i-1);
+        penalizationOut_op(i)=penalizationOut_op5f(i-1);
+        minDev_op(i)=minDev_op5f(i-1);
+        if subject_ID==subject_ID5f
+            subject_ID=subject_ID5f;
+            chanlocs=chanlocs5f;
+            ch_labels=ch_labels5f;
+            ch_dubious=ch_dubious5f;
+            ch_peripheral=ch_peripheral5f;
+        end
+    end
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert_add_delta
+    save([num2str(subject_ID) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
+        'penalizationIn_op','penalizationOut_op','minDev_op', ...
+        'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
+    toc
+end
