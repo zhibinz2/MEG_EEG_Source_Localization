@@ -92,3 +92,8 @@ bandlabels = {'Delta','Theta', 'Alpha', 'Mu', 'Beta1', 'Beta2'};
 source_coordinates=corti_ave_source_coor;
 source_roi_index=corti_ave_source_labl;
 save('source_info.mat','source_coordinates','source_roi_index','bandlabels');
+
+cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/organize_62stroke
+load('demographics.mat')
+cd /home/zhibinz2/Documents/GitHub/STROKE_P61
+save('demographics_p61.mat','matfile_names','les_mak_fileNames','days_poststroke','FM_scores','ages');
