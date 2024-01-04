@@ -1,12 +1,13 @@
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('hilbert_dataCov_all.mat');
 
-%%
+%% preapare
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/
 for ses=12%12
     tic
     for subj=1:2
         for tr=1:12
+            % condition not sorted
             load(['./cortical_source_data/' num2str(seeds(ses,:)) '/subj' num2str(subj) '_tr_' num2str(tr) '.mat']);
 
             hilbert_dataCov=cell(1,5);
@@ -29,7 +30,7 @@ for ses=12%12
     toc
 end
 
-%%
+%% Combine the precision matrix after applying lasso in python on multiple computers
 clear
 tic
 cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
@@ -108,8 +109,8 @@ imagesc(logical(prec));colorbar
 prec_all_ses_1_12(12,:,:,:,:,:)=prec_all_ses_12(12,:,:,:,:,:);
 clear prec_all_ses_12 prec_all
 
-cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
-save('prec_all_ses_1_12.mat','prec_all_ses_1_12','-v7.3');
+cd /ssd/zhibin/1overf/Cleaned_sourcedata/cortical_source_data/python_lasso
+save('prec_all_ses_1_12.mat','prec_all_ses_1_12','-v7.3'); % condition not sorted
 toc % 300s
 
 figure
@@ -134,7 +135,7 @@ end
 %%
 % convert to complex prec
 cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
-Complex_prec_all=nan(12,2,12,5,448,448);
+Complex_prec_all=nan(12,2,12,5,448,448); % condition not sorted
 tic
 for ses=1:12
     for subj=1:2
@@ -161,9 +162,11 @@ for ses=1:12
     end
 end
 toc % 10s
-cd /ssd/zhibin/Cleaned_sourcedata/cortical_source_data/python_lasso
+cd /ssd/zhibin/1overf/Cleaned_sourcedata/cortical_source_data/python_lasso
 Pcoh_lasso=coh_lasso;
 save('Pcoh_lasso.mat','Pcoh_lasso','-v7.3');
+% condition not sorted
+
 
 figure
 for ses=1:12 
@@ -203,7 +206,11 @@ for ses =1:12
         end
     end
 end
-%% 2X4 condi
+
+%% sort condition here
+
+
+%% 2X4 condi (wrong, condition not sorted)
 % organzied into 2 syn type and 4 conditons
 NedgeIn_coh4=cell(2,4,5); 
 NedgeOut_coh4=cell(2,4,5);
