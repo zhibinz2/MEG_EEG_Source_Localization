@@ -186,6 +186,31 @@ for ses=1:12
     end
 end
 
+
+%% sort condition here
+seeds=[20220713;20220721;20220804;20220808;20220810;20220811;20220815;20220816;20221003;2022100401;
+        2022100402;20221005];
+numSes=size(seeds,1);
+
+cd /ssd/zhibin/1overf/Cleaned_sourcedata/cortical_source_data/python_lasso
+load('Pcoh_lasso.mat')
+Pcoh_lasso_sorted=nan(12,2,12,5,448,448);
+for ses=1:12
+    runid = num2str(seeds(ses,:));
+    load(['/home/zhibinz2/Documents/GitHub/Cleaned_data/clean_' runid '.mat'],'conditions')
+    [x,sortorder]=sort(conditions);
+    for subj=1:2
+        for tr=1:12
+            for freq=1:5
+                Pcoh_lasso_sorted(ses,subj,tr,freq,:,:)=Pcoh_lasso(ses,subj,sortorder(tr),freq,:,:);
+            end
+        end
+    end
+end
+cd /ssd/zhibin/1overf/Cleaned_sourcedata/cortical_source_data/python_lasso
+save('Pcoh_lasso_sorted.mat','Pcoh_lasso_sorted','-v7.3');
+% condition sorted
+
 %% compute # edges in and out
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('SC.mat');
@@ -199,7 +224,7 @@ for ses =1:12
     for subj = 1:2
         for tr =1:12
             for freq=1:5
-                G=logical(squeeze(coh_lasso(ses,subj,tr,freq,:,:)));
+                G=logical(squeeze(Pcoh_lasso_sorted(ses,subj,tr,freq,:,:)));
                 NedgeIn_coh(ses,subj,tr,freq) = sum(G.*triu(SC,1),'all');
                 NedgeOut_coh(ses,subj,tr,freq) =  sum(G.*triu(~SC,1),'all');
             end
@@ -207,10 +232,8 @@ for ses =1:12
     end
 end
 
-%% sort condition here
 
-
-%% 2X4 condi (wrong, condition not sorted)
+%% 2X4 condi 
 % organzied into 2 syn type and 4 conditons
 NedgeIn_coh4=cell(2,4,5); 
 NedgeOut_coh4=cell(2,4,5);
