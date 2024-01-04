@@ -337,8 +337,7 @@ end
 toc % 33s 
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 save('Complex_X_op3_all.mat','Complex_X_op3_all','-v7.3'); % converted to complex value cov
-% Complex_X_op3_all.mat is 448x448 complex covariance after AGL
-% condition sorted
+% Complex_X_op3_all.mat
 
 % examine fraction
 for ses=1:12

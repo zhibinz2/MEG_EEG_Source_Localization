@@ -72,8 +72,7 @@ end
 toc % 12S
 % cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 % save('Pcoh_all.mat','Pcoh_all','-v7.3');
-% Pcoh_all.mat is real value partial coherence after AGL (448X448)
-% with condition sorted already
+% 
 
 ses=1;
 subj=1;
@@ -89,8 +88,6 @@ subtitle(['ses ' num2str(ses) ' subj ' num2str(subj) ' trial ' num2str(tr) ' fre
 % convert Pcoh_all to boolean
 Pcoh_boolean=logical(Pcoh_all);
 save('Pcoh_boolean.mat','Pcoh_boolean','-v7.3');
-% Pcoh_boolean.mat is logical value partial coherence after AGL (448X448)
-% with condition sorted already
 
 ses=3;
 subj=2;
