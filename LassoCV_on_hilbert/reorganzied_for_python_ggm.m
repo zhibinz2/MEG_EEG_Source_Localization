@@ -210,7 +210,8 @@ end
 cd /ssd/zhibin/1overf/Cleaned_sourcedata/cortical_source_data/python_lasso
 save('Pcoh_lasso_sorted.mat','Pcoh_lasso_sorted','-v7.3');
 % condition sorted
-
+Pcoh_boolean_lasso=logical(Pcoh_lasso_sorted);
+save('Pcoh_boolean_lasso.mat','Pcoh_boolean_lasso','-v7.3');
 %% compute # edges in and out
 cd /home/zhibinz2/Documents/GitHub/Cleaned_data/hilbert_datacov
 load('SC.mat');
