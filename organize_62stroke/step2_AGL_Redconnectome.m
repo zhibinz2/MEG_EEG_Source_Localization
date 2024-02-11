@@ -48,6 +48,7 @@ addpath(genpath('../../AdaptiveGraphicalLassoforParCoh/AGL'))
 % sum(triu(logical(squeeze(fullConnectome_p61(61,:,:))),1),"all") % 5814 edges
 
 % extract indivisual reduced sc
+cd /home/zhibinz2/Documents/GitHub/STROKE_P61/getLesionMaskConnectome_nonflip_p61
 load('Connectome_p61.mat', 'redConnectome_p61')
 SC_p61=nan(61,448,448);
 for p=1:61
@@ -59,7 +60,7 @@ end
 
 %% penalty selection and fit precision
 subj_files=[0:1:60];
-for f=1:61
+for f=8:15
     tic
     cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_corti_source
     load([num2str(subj_files(f)) '.mat'],'corti_source_data','subject_ID', ...

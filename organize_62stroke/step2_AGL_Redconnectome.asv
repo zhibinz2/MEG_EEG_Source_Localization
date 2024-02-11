@@ -48,6 +48,7 @@ addpath(genpath('../../AdaptiveGraphicalLassoforParCoh/AGL'))
 % sum(triu(logical(squeeze(fullConnectome_p61(61,:,:))),1),"all") % 5814 edges
 
 % extract indivisual reduced sc
+cd /home/zhibinz2/Documents/GitHub/STROKE_P61/getLesionMaskConnectome_nonflip_p61
 load('Connectome_p61.mat', 'redConnectome_p61')
 SC_p61=nan(61,448,448);
 for p=1:61
@@ -94,8 +95,10 @@ for f=1:61
 
         clear corti_source_data filtered_data  hilbertdata
         clear sourceDataReal datareshaped 
-        %
+        clear SC
 
+        % Individual SC from redConnectome
+        SC=squeeze(SC_p61(f,:,:));
 
         % AGL
         cd /home/zhibinz2/Documents/GitHub/MEG_EEG_Source_Localization/PCA_32chan_AGL
@@ -110,7 +113,7 @@ for f=1:61
     end
     clear downsample_data datapermuted
 
-    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_61_source_hilbert_redC
     save([num2str(subject_ID) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
         'penalizationIn_op','penalizationOut_op','minDev_op', ...
         'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
