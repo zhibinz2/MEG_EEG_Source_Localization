@@ -1,9 +1,11 @@
 clear
+addpath /home/zhibinz2/Documents/GitHub/AdaptiveGraphicalLassoforParCoh/Simulations/util
 subj_files=[0:1:60];
 for f=1:61
     tic
     % cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert
-    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert_add_delta
+    % cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_62_source_hilbert_add_delta
+    cd /home/zhibinz2/Documents/GitHub/archive/EEG_stroke_61_source_hilbert_redC
     load([num2str(subj_files(f)) '.mat'],'stroke_Cov', 'stroke_Pcov', ...
         'penalizationIn_op','penalizationOut_op','minDev_op', ...
         'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
@@ -16,7 +18,8 @@ for f=1:61
         tmp_Cov=stroke_Pcov{freq}; tmp_Cov(isnan(tmp_Cov))=1;
         stroke_Pcoh{freq}=normalizeCSD(r2c(logical(tmp_Cov)));
     end
-    cd /home/zhibinz2/Documents/GitHub/archive/EEE_stroke_61_coh
+%     cd /home/zhibinz2/Documents/GitHub/archive/EEE_stroke_61_coh
+    cd /home/zhibinz2/Documents/GitHub/archive/EEE_stroke_61_coh_redC
     save([num2str(subject_ID) '.mat'],'stroke_coh', 'stroke_Pcoh', ...
         'penalizationIn_op','penalizationOut_op','minDev_op', ...
         'subject_ID','chanlocs','ch_labels','ch_dubious','ch_peripheral','Fs');
